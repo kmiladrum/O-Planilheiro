@@ -5,39 +5,32 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    console.log('Body recebido:', JSON.stringify(req.body));
+    let body = req.body;
+    if (typeof body === 'string') body = JSON.parse(body);
 
-    const system = req.body?.system || '';
-    const messages = req.body?.messages || [];
-
-    console.log('System:', system.slice(0, 50));
-    console.log('Messages count:', messages.length);
+    const system = body.system || '';
+    const messages = body.messages || [];
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_KEY}`;
-
-    const payload = {
-      system_instruction: { parts: [{ text: system }] },
-      contents: messages,
-      generationConfig: { temperature: 0.7, maxOutputTokens: 1500 }
-    };
-
-    console.log('Payload enviado:', JSON.stringify(payload).slice(0, 200));
 
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: system }] },
+        contents: [{ role: 'user', parts: [{ text: messages[messages.length-1]?.parts?.[0]?.text || 'oi' }] }],
+        generationConfig: { temperature: 0.7, maxOutputTokens: 1500 }
+      })
     });
 
     const data = await response.json();
-    console.log('Gemini status:', response.status);
-    console.log('Gemini resposta:', JSON.stringify(data).slice(0, 300));
-
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sem resposta.';
+    console.log('FULL RESPONSE:', JSON.stringify(data));
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || JSON.stringify(data);
     res.status(200).json({ text });
 
   } catch(err) {
-    console.error('ERRO:', err.message);
     res.status(500).json({ error: err.message });
   }
 }
+
+export const config = { api: { bodyParser: true } };
