@@ -3,15 +3,11 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>O Planilheiro — Agente</title>
+<title>O Planilheiro</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-:root {
-  --am: #d97706; --am2: #f59e0b; --am3: #fcd34d;
-  --bg: #080600; --s1: #120d00; --s2: #1a1200;
-  --bd: #2a1f00; --txt: #fef3c7; --mut: #78450a;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--am:#d97706;--am2:#f59e0b;--bg:#080600;--s1:#120d00;--bd:#2a1f00;--txt:#fef3c7;--mut:#78450a;}
+*{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(245,158,11,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(245,158,11,0.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
 .header{padding:13px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;background:rgba(8,6,0,0.95);backdrop-filter:blur(12px);position:relative;z-index:10;flex-shrink:0;}
@@ -22,23 +18,23 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .dot{width:5px;height:5px;border-radius:50%;background:var(--am2);display:inline-block;animation:pulse 2s infinite;}
 .header-right{display:flex;align-items:center;gap:8px;}
 .badge-plan{background:rgba(217,119,6,0.12);border:1px solid rgba(217,119,6,0.25);color:var(--am2);padding:4px 12px;border-radius:20px;font-size:11px;font-family:'DM Mono',monospace;}
-.btn-logout{background:transparent;border:1px solid var(--bd);color:var(--mut);padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;transition:all 0.2s;}
+.btn-logout{background:transparent;border:1px solid var(--bd);color:var(--mut);padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;}
 .btn-logout:hover{border-color:#ef4444;color:#fca5a5;}
 .btn-upgrade{background:linear-gradient(135deg,#d97706,#b45309);color:white;border:none;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;}
-.mode-wrap{padding:10px 16px;display:flex;justify-content:flex-start;flex-shrink:0;position:relative;z-index:1;}
-.mode-toggle{display:flex;gap:4px;background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:4px;}
+.mode-wrap{padding:10px 16px;flex-shrink:0;position:relative;z-index:1;}
+.mode-toggle{display:flex;gap:4px;background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:4px;width:fit-content;}
 .mode-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;transition:all 0.25s;background:transparent;color:var(--mut);}
-.mode-btn.active{background:linear-gradient(135deg,#d97706,#b45309);color:white;box-shadow:0 2px 12px rgba(217,119,6,0.35);}
+.mode-btn.active{background:linear-gradient(135deg,#d97706,#b45309);color:white;}
 .mode-btn:disabled{opacity:0.35;cursor:not-allowed;}
 .pro-tag{font-size:9px;background:rgba(217,119,6,0.2);color:var(--am2);padding:2px 6px;border-radius:6px;font-weight:700;}
-.gerador-bar{background:rgba(217,119,6,0.06);border-bottom:1px solid var(--bd);padding:10px 20px;display:flex;align-items:center;gap:10px;font-size:13px;color:#fcd34d;flex-shrink:0;position:relative;z-index:1;}
+.gerador-bar{background:rgba(217,119,6,0.06);border-bottom:1px solid var(--bd);padding:10px 20px;display:none;align-items:center;gap:10px;font-size:13px;color:#fcd34d;flex-shrink:0;position:relative;z-index:1;}
 .chat-area{flex:1;overflow-y:auto;padding:20px 16px;position:relative;z-index:1;}
 .chat-inner{max-width:720px;margin:0 auto;}
 .msg{display:flex;margin-bottom:16px;animation:fadeUp 0.3s ease;}
 .msg.user{justify-content:flex-end;}
-.msg-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#d97706,#b45309);display:flex;align-items:center;justify-content:center;font-size:17px;margin-right:10px;flex-shrink:0;box-shadow:0 0 12px rgba(245,158,11,0.25);}
+.msg-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#d97706,#b45309);display:flex;align-items:center;justify-content:center;font-size:17px;margin-right:10px;flex-shrink:0;}
 .msg-bubble{max-width:78%;padding:11px 15px;font-size:14px;line-height:1.75;border-radius:16px 16px 16px 4px;background:var(--s1);border:1px solid var(--bd);color:var(--txt);}
-.msg.user .msg-bubble{background:linear-gradient(135deg,#d97706,#b45309);border:none;border-radius:16px 16px 4px 16px;box-shadow:0 4px 15px rgba(217,119,6,0.25);}
+.msg.user .msg-bubble{background:linear-gradient(135deg,#d97706,#b45309);border:none;border-radius:16px 16px 4px 16px;}
 .msg-code{background:#040200;border:1px solid #1a1000;border-radius:8px;padding:10px 14px;font-family:'DM Mono',monospace;font-size:12.5px;color:#fcd34d;margin-top:8px;overflow-x:auto;line-height:1.7;white-space:pre-wrap;}
 .typing{display:flex;align-items:center;gap:5px;padding:10px 14px;}
 .typing span{width:7px;height:7px;border-radius:50%;background:var(--am2);animation:bounce 1.2s infinite;}
@@ -49,10 +45,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .chips{display:flex;flex-wrap:wrap;gap:8px;}
 .chip{background:var(--s1);border:1px solid var(--bd);color:var(--mut);padding:6px 13px;border-radius:20px;font-size:12px;font-family:inherit;cursor:pointer;transition:all 0.2s;}
 .chip:hover{background:var(--am);color:white;border-color:var(--am);}
-.banner-wrap{max-width:720px;margin:0 auto;padding:0 16px 8px;position:relative;z-index:1;}
-.banner-limit{background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.2);border-radius:10px;padding:10px 14px;font-size:12px;color:#fbbf24;text-align:center;}
-.banner-block{background:linear-gradient(135deg,#1a0e00,var(--s1));border:1px solid rgba(217,119,6,0.4);border-radius:12px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
-.banner-block p{font-size:13px;color:var(--txt);}
+.banner-wrap{max-width:720px;margin:0 auto;padding:0 16px 8px;position:relative;z-index:1;display:none;}
+.banner-limit{background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.2);border-radius:10px;padding:10px 14px;font-size:12px;color:#fbbf24;text-align:center;display:none;}
+.banner-block{background:linear-gradient(135deg,#1a0e00,var(--s1));border:1px solid rgba(217,119,6,0.4);border-radius:12px;padding:14px 18px;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
 .input-wrap{max-width:720px;margin:0 auto;padding:0 16px 20px;position:relative;z-index:1;}
 .input-box{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:12px 16px;display:flex;align-items:flex-end;gap:10px;}
 .input-box:focus-within{border-color:var(--am);}
@@ -60,12 +55,12 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 #msg-input::placeholder{color:#3a2f00;}
 .send-btn{width:36px;height:36px;border-radius:10px;border:none;background:linear-gradient(135deg,#d97706,#b45309);color:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;}
 .send-btn:disabled{background:#1a1200;color:#3a2f00;cursor:not-allowed;}
-.input-footer{display:flex;justify-content:flex-end;margin-top:6px;font-size:11px;color:#1a1200;}
+.input-footer{text-align:right;margin-top:6px;font-size:11px;color:#1a1200;}
 #login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100;}
 .login-card{width:100%;max-width:420px;background:var(--s1);border:1px solid var(--bd);border-radius:22px;padding:44px 38px;box-shadow:0 40px 100px rgba(0,0,0,0.6);}
 .login-logo{text-align:center;margin-bottom:34px;}
-.login-icon{width:60px;height:60px;border-radius:17px;background:linear-gradient(135deg,#d97706,#92400e);display:inline-flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:14px;box-shadow:0 0 30px rgba(217,119,6,0.3);}
-.login-title{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;color:white;letter-spacing:-0.5px;}
+.login-icon{width:60px;height:60px;border-radius:17px;background:linear-gradient(135deg,#d97706,#92400e);display:inline-flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:14px;}
+.login-title{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;color:white;}
 .login-sub{font-size:13px;color:var(--mut);margin-top:5px;}
 .error-box{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);color:#fca5a5;border-radius:10px;padding:11px 14px;font-size:13px;margin-bottom:18px;text-align:center;display:none;}
 .field label{display:block;font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
@@ -73,7 +68,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .pass-wrap input{width:100%;background:#140c00;border:1px solid var(--bd);border-radius:11px;padding:13px 46px 13px 16px;color:var(--txt);font-family:'DM Mono',monospace;font-size:15px;letter-spacing:0.12em;outline:none;transition:border-color 0.2s;}
 .pass-wrap input:focus{border-color:var(--am);}
 .show-pass{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--mut);font-size:16px;padding:0;}
-.btn-login{width:100%;padding:14px;background:linear-gradient(135deg,#d97706,#b45309);color:white;border:none;border-radius:11px;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;margin-top:20px;box-shadow:0 0 25px rgba(217,119,6,0.25);}
+.btn-login{width:100%;padding:14px;background:linear-gradient(135deg,#d97706,#b45309);color:white;border:none;border-radius:11px;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;margin-top:20px;}
 .login-divider{border-top:1px solid var(--bd);margin:24px 0;}
 .login-hint{text-align:center;font-size:13px;color:var(--mut);}
 .login-hint a{color:var(--am2);text-decoration:none;font-weight:700;}
@@ -132,17 +127,17 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     </div>
   </div>
 
-  <div class="gerador-bar" id="gerador-bar" style="display:none">
+  <div class="gerador-bar" id="gerador-bar">
     ⚡ <span><strong>Modo Gerador:</strong> Me conta o que precisa — faço as perguntas certas e monto tudo personalizado.</span>
   </div>
 
-  <div class="banner-wrap" id="banner-wrap" style="display:none">
-    <div class="banner-limit" id="banner-limit" style="display:none">
+  <div class="banner-wrap" id="banner-wrap">
+    <div class="banner-limit" id="banner-limit">
       ⚠️ Apenas <strong id="restantes-txt"></strong> perguntas restantes hoje.
       <a href="planilheiro-landing-final.html" style="color:#f59e0b;font-weight:700;text-decoration:none">Upgrade →</a>
     </div>
-    <div class="banner-block" id="banner-block" style="display:none">
-      <p>🚫 Limite de <strong style="color:#f59e0b">50 perguntas</strong> atingido. Renova amanhã ou faça upgrade.</p>
+    <div class="banner-block" id="banner-block">
+      <p>🚫 Limite de <strong style="color:#f59e0b">50 perguntas</strong> atingido.</p>
       <a href="planilheiro-landing-final.html" class="btn-upgrade">Upgrade Pro →</a>
     </div>
   </div>
@@ -161,209 +156,261 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       <textarea id="msg-input" rows="1" placeholder="Cole sua fórmula, descreva o erro ou faça uma pergunta..."></textarea>
       <button class="send-btn" id="send-btn" onclick="enviar()">↑</button>
     </div>
-    <div class="input-footer">O Planilheiro · Powered by Gemini AI</div>
+    <div class="input-footer">O Planilheiro · Powered by Claude</div>
   </div>
 </div>
 
 <script>
 // =====================================================
-// ⚠️ COLOQUE SUA CHAVE DO GEMINI AQUI
+// SENHAS
 // =====================================================
-
-// =====================================================
-
-// ⚠️ SENHAS — altere se quiser
 const SENHAS_BASICO = ["BASICO2025", "PLAN123", "EXCEL001"];
 const SENHAS_PRO    = ["PRO2025", "PLANPRO1", "POWERBI01"];
 const LIMITE_BASICO = 50;
 
+// =====================================================
+// PROMPTS
+// =====================================================
 const SYSTEM_CHAT = `Você é o Planilheiro, especialista em Excel e Power BI.
 Você resolve fórmulas (PROCV, ÍNDICE/CORRESP, SOMASES, CONT.SES, matriciais), erros (#VALOR!, #REF!, #N/D, #DIV/0!), medidas DAX para Power BI, tabelas dinâmicas, formatação condicional e macros VBA básicas.
 Ao dar fórmulas ou DAX, use blocos de código e explique cada parte.
 Seja direto, prático e didático. Responda sempre em português do Brasil e use linguagem fácil para leigos.`;
 
 const SYSTEM_GERADOR = `Você é o Planilheiro, especialista em criar planilhas avançadas e dashboards profissionais.
-SEMPRE comece perguntando: 1) Qual o objetivo? 2) Quais dados tem? 3) Pessoal ou empresa? 4) Alguma preferência visual?
+SEMPRE comece perguntando: 1) Qual o objetivo? 2) Quais dados tem? 3) Pessoal ou empresa? 4) Preferência visual?
 Para PLANILHAS EXCEL entregue: estrutura de abas, cabeçalhos, fórmulas prontas em blocos de código, formatação condicional, tabela dinâmica e validações.
 Para DASHBOARDS POWER BI entregue: modelo de dados, relacionamentos, medidas DAX, visuais sugeridos, filtros e dicas de layout.
 Ao final SEMPRE pergunte se quer um arquivo modelo pronto.
 Seja extremamente detalhado. Responda sempre em português do Brasil.`;
 
-const CHIPS_CHAT = ["Como fazer PROCV entre duas abas?","Erro #N/D no PROCV, como corrigir?","Fórmula para somar por mês automaticamente","Como travar célula com F4?","Medida DAX de % crescimento mês a mês","Como criar coluna calculada no Power BI?"];
+const CHIPS_CHAT    = ["Como fazer PROCV entre duas abas?","Erro #N/D no PROCV, como corrigir?","Fórmula para somar por mês automaticamente","Como travar célula com F4?","Medida DAX de % crescimento mês a mês","Como criar coluna calculada no Power BI?"];
 const CHIPS_GERADOR = ["Planilha de controle financeiro pessoal","Controle de estoque com alertas","Dashboard de vendas por vendedor","Fluxo de caixa empresarial","Dashboard RH com headcount e turnover","Relatório de metas vs resultado Power BI"];
 
-let plano = null, modo = "chat", loading = false;
+// =====================================================
+// ESTADO
+// =====================================================
+let plano = null;
+let modo  = "chat";
+let loading = false;
+
+// Histórico separado por modo — formato Claude: [{role, content}]
 let historico = { chat: [], gerador: [] };
 
-// ── Login ─────────────────────────────────────────
+// =====================================================
+// LOGIN
+// =====================================================
 document.getElementById("senha-input").addEventListener("keydown", e => { if(e.key==="Enter") entrar(); });
-function togglePass() { const i = document.getElementById("senha-input"); i.type = i.type==="password"?"text":"password"; }
+
+function togglePass() {
+  const i = document.getElementById("senha-input");
+  i.type = i.type === "password" ? "text" : "password";
+}
 
 function entrar() {
   const s = document.getElementById("senha-input").value.trim().toUpperCase();
-  if (SENHAS_PRO.map(x=>x.toUpperCase()).includes(s)) { plano="pro"; iniciar(); }
-  else if (SENHAS_BASICO.map(x=>x.toUpperCase()).includes(s)) { plano="basico"; iniciar(); }
-  else { document.getElementById("error-box").style.display="block"; document.getElementById("senha-input").value=""; }
+  if (SENHAS_PRO.map(x=>x.toUpperCase()).includes(s))    { plano="pro";    iniciar(); return; }
+  if (SENHAS_BASICO.map(x=>x.toUpperCase()).includes(s)) { plano="basico"; iniciar(); return; }
+  document.getElementById("error-box").style.display = "block";
+  document.getElementById("senha-input").value = "";
 }
 
 function iniciar() {
-  document.getElementById("login-screen").style.display="none";
+  document.getElementById("login-screen").style.display = "none";
   const app = document.getElementById("app-screen");
-  app.style.display="flex";
-  if (plano==="basico") {
-    document.getElementById("plan-label").textContent="Plano Básico — "+Math.max(0,LIMITE_BASICO-getUsos())+" perguntas restantes";
-    document.getElementById("plan-badge").textContent="⚡ Básico";
-    document.getElementById("btn-upgrade").style.display="inline-block";
-    document.getElementById("pro-tag").style.display="inline";
-    document.getElementById("btn-gerador").disabled=true;
+  app.style.display = "flex";
+
+  if (plano === "basico") {
+    document.getElementById("plan-label").textContent = "Plano Básico — " + Math.max(0, LIMITE_BASICO - getUsos()) + " perguntas restantes";
+    document.getElementById("plan-badge").textContent = "⚡ Básico";
+    document.getElementById("btn-upgrade").style.display = "inline-block";
+    document.getElementById("pro-tag").style.display = "inline";
+    document.getElementById("btn-gerador").disabled = true;
   }
-  addMsg("chat","assistant",`Fala! 👋 Sou o **Planilheiro** — pode me mandar qualquer dúvida sobre **fórmulas**, **erros** ou **DAX**. Explico tudo de forma simples!\n\n${plano==="pro"?"✨ Você está no **Plano Pro** — acesso completo e ilimitado.":"⚡ Você está no **Plano Básico** — 50 perguntas por dia."}`);
-  addMsg("gerador","assistant","Fala! 🚀 Sou o **Planilheiro** — me conta o que você precisa montar. Pode ser planilha Excel ou dashboard Power BI. Faço as perguntas certas e monto tudo personalizado pra você!");
+
+  // Mensagem de boas-vindas (não vai para o histórico — só exibição)
+  const bv = plano === "pro"
+    ? "Fala! 👋 Sou o **Planilheiro** — pode me mandar qualquer dúvida sobre **fórmulas**, **erros** ou **DAX**. Explico tudo de forma simples!\n\n✨ Você está no **Plano Pro** — acesso completo e ilimitado."
+    : "Fala! 👋 Sou o **Planilheiro** — pode me mandar qualquer dúvida sobre **fórmulas**, **erros** ou **DAX**. Explico tudo de forma simples!\n\n⚡ Você está no **Plano Básico** — 50 perguntas por dia.";
+
+  exibeMsg("assistant", bv);
   renderChips();
 }
 
 function sair() { location.reload(); }
 
-// ── Modo ──────────────────────────────────────────
+// =====================================================
+// MODO
+// =====================================================
 function setMode(m) {
-  if (m==="gerador" && plano==="basico") return;
-  modo=m;
-  document.getElementById("btn-chat").classList.toggle("active",m==="chat");
-  document.getElementById("btn-gerador").classList.toggle("active",m==="gerador");
-  document.getElementById("gerador-bar").style.display=m==="gerador"?"flex":"none";
-  document.getElementById("msg-input").placeholder=m==="chat"?"Cole sua fórmula, descreva o erro ou faça uma pergunta...":"Ex: quero um controle financeiro com gastos por categoria...";
-  document.getElementById("chips-label").textContent=m==="chat"?"Perguntas frequentes":"Exemplos para começar";
-  renderChat(); renderChips(); checkBanners();
+  if (m === "gerador" && plano === "basico") return;
+  modo = m;
+  document.getElementById("btn-chat").classList.toggle("active", m === "chat");
+  document.getElementById("btn-gerador").classList.toggle("active", m === "gerador");
+  document.getElementById("gerador-bar").style.display = m === "gerador" ? "flex" : "none";
+  document.getElementById("msg-input").placeholder = m === "chat"
+    ? "Cole sua fórmula, descreva o erro ou faça uma pergunta..."
+    : "Ex: quero um controle financeiro com gastos por categoria...";
+  document.getElementById("chips-label").textContent = m === "chat" ? "Perguntas frequentes" : "Exemplos para começar";
+
+  // Limpa tela e reexibe histórico do modo
+  document.getElementById("chat-inner").innerHTML = "";
+  historico[modo].forEach(msg => exibeMsg(msg.role === "assistant" ? "assistant" : "user", msg.content));
+  if (historico[modo].length === 0) {
+    const bv = "Fala! 🚀 Sou o **Planilheiro** — me conta o que precisa montar. Pode ser planilha Excel ou dashboard Power BI!";
+    exibeMsg("assistant", bv);
+  }
+  renderChips();
+  checkBanners();
 }
 
-// ── Chat ──────────────────────────────────────────
-function addMsg(m, role, content) {
-  historico[m].push({role,content});
-  if (m===modo) renderChat();
-}
-
-function renderChat() {
+// =====================================================
+// RENDERIZAÇÃO
+// =====================================================
+function exibeMsg(role, content) {
   const ci = document.getElementById("chat-inner");
-  ci.innerHTML="";
-  historico[modo].forEach(msg => {
-    const isUser = msg.role==="user";
-    const div = document.createElement("div");
-    div.className="msg"+(isUser?" user":"");
-    if (!isUser) { const av=document.createElement("div"); av.className="msg-avatar"; av.textContent="📊"; div.appendChild(av); }
-    const bubble=document.createElement("div"); bubble.className="msg-bubble";
-    bubble.innerHTML=formatMsg(msg.content);
-    div.appendChild(bubble); ci.appendChild(div);
-  });
-  scrollBottom();
-  document.getElementById("chips-wrap").style.display=historico[modo].length<=2?"block":"none";
+  const isUser = role === "user";
+  const div = document.createElement("div");
+  div.className = "msg" + (isUser ? " user" : "");
+  if (!isUser) {
+    const av = document.createElement("div");
+    av.className = "msg-avatar"; av.textContent = "📊";
+    div.appendChild(av);
+  }
+  const bubble = document.createElement("div");
+  bubble.className = "msg-bubble";
+  bubble.innerHTML = formatMsg(content);
+  div.appendChild(bubble);
+  ci.appendChild(div);
+  document.getElementById("chat-area").scrollTop = document.getElementById("chat-area").scrollHeight;
+  document.getElementById("chips-wrap").style.display = historico[modo].length === 0 ? "block" : "none";
 }
 
 function formatMsg(text) {
   return text.split(/(```[\s\S]*?```)/g).map(part => {
-    if (part.startsWith("```")&&part.endsWith("```")) {
-      const code=part.slice(3,-3).replace(/^\w+\n/,"");
-      return `<div class="msg-code">${escHtml(code)}</div>`;
+    if (part.startsWith("```") && part.endsWith("```")) {
+      const code = part.slice(3,-3).replace(/^\w+\n/,"");
+      return `<div class="msg-code">${esc(code)}</div>`;
     }
     return part
-      .replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>")
-      .replace(/## (.*?)(\n|$)/g,"<div style='color:#f59e0b;font-weight:700;font-size:13px;margin-top:10px;margin-bottom:4px'>$1</div>")
-      .replace(/### (.*?)(\n|$)/g,"<div style='color:#fcd34d;font-weight:700;font-size:13px;margin-top:8px;margin-bottom:2px'>$1</div>")
-      .replace(/\n/g,"<br/>");
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/## (.*?)(\n|$)/g, "<div style='color:#f59e0b;font-weight:700;font-size:13px;margin-top:10px;margin-bottom:4px'>$1</div>")
+      .replace(/### (.*?)(\n|$)/g, "<div style='color:#fcd34d;font-weight:700;font-size:13px;margin-top:8px;margin-bottom:2px'>$1</div>")
+      .replace(/\n/g, "<br/>");
   }).join("");
 }
 
-function escHtml(t) { return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function esc(t) { return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
 function renderChips() {
-  const chips=modo==="chat"?CHIPS_CHAT:CHIPS_GERADOR;
-  const cl=document.getElementById("chips-list"); cl.innerHTML="";
-  chips.forEach(c=>{ const btn=document.createElement("button"); btn.className="chip"; btn.textContent=c; btn.onclick=()=>enviar(c); cl.appendChild(btn); });
+  const chips = modo === "chat" ? CHIPS_CHAT : CHIPS_GERADOR;
+  const cl = document.getElementById("chips-list"); cl.innerHTML = "";
+  chips.forEach(c => {
+    const btn = document.createElement("button");
+    btn.className = "chip"; btn.textContent = c;
+    btn.onclick = () => enviar(c);
+    cl.appendChild(btn);
+  });
 }
-function scrollBottom() { const ca=document.getElementById("chat-area"); ca.scrollTop=ca.scrollHeight; }
 
-// ── Limite ────────────────────────────────────────
-function getUsos() { const hoje=new Date().toDateString(); const s=localStorage.getItem("pl_usos"); if(!s) return 0; const p=JSON.parse(s); return p.data!==hoje?0:p.count; }
-function addUso() { const hoje=new Date().toDateString(); const count=getUsos()+1; localStorage.setItem("pl_usos",JSON.stringify({data:hoje,count})); return count; }
+// =====================================================
+// LIMITE BÁSICO
+// =====================================================
+function getUsos() {
+  const hoje = new Date().toDateString();
+  const s = localStorage.getItem("pl_usos");
+  if (!s) return 0;
+  const p = JSON.parse(s);
+  return p.data !== hoje ? 0 : p.count;
+}
+
+function addUso() {
+  const hoje = new Date().toDateString();
+  const count = getUsos() + 1;
+  localStorage.setItem("pl_usos", JSON.stringify({data:hoje,count}));
+  return count;
+}
+
 function checkBanners() {
-  if (plano!=="basico") return;
-  const usos=getUsos(); const restantes=LIMITE_BASICO-usos;
-  const bw=document.getElementById("banner-wrap");
-  bw.style.display=restantes<=10?"block":"none";
-  document.getElementById("banner-limit").style.display=restantes<=10&&restantes>0?"block":"none";
-  document.getElementById("banner-block").style.display=restantes<=0?"block":"none";
-  if (restantes<=10&&restantes>0) document.getElementById("restantes-txt").textContent=restantes+" perguntas";
-  document.getElementById("plan-label").textContent="Plano Básico — "+Math.max(0,restantes)+" perguntas restantes";
+  if (plano !== "basico") return;
+  const restantes = LIMITE_BASICO - getUsos();
+  const bw = document.getElementById("banner-wrap");
+  bw.style.display = restantes <= 10 ? "block" : "none";
+  document.getElementById("banner-limit").style.display = restantes <= 10 && restantes > 0 ? "block" : "none";
+  document.getElementById("banner-block").style.display = restantes <= 0 ? "flex" : "none";
+  if (restantes <= 10 && restantes > 0) document.getElementById("restantes-txt").textContent = restantes + " perguntas";
+  document.getElementById("plan-label").textContent = "Plano Básico — " + Math.max(0,restantes) + " perguntas restantes";
 }
 
-// ── Input ─────────────────────────────────────────
-document.getElementById("msg-input").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();enviar();} });
-document.getElementById("msg-input").addEventListener("input",function(){ this.style.height="auto"; this.style.height=Math.min(this.scrollHeight,130)+"px"; document.getElementById("send-btn").disabled=!this.value.trim()||loading; });
+// =====================================================
+// INPUT
+// =====================================================
+document.getElementById("msg-input").addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); }
+});
+document.getElementById("msg-input").addEventListener("input", function() {
+  this.style.height = "auto";
+  this.style.height = Math.min(this.scrollHeight, 130) + "px";
+  document.getElementById("send-btn").disabled = !this.value.trim() || loading;
+});
 
-// ── Enviar via GEMINI ─────────────────────────────
+// =====================================================
+// ENVIAR — formato Claude puro
+// =====================================================
 async function enviar(txt) {
-  const input=document.getElementById("msg-input");
-  const text=txt||input.value.trim();
-  if (!text||loading) return;
+  const input = document.getElementById("msg-input");
+  const text = txt || input.value.trim();
+  if (!text || loading) return;
 
-  if (plano==="basico") { const total=addUso(); checkBanners(); if(total>LIMITE_BASICO) return; }
+  if (plano === "basico") {
+    const total = addUso();
+    checkBanners();
+    if (total > LIMITE_BASICO) return;
+  }
 
-  addMsg(modo,"user",text);
-  input.value=""; input.style.height="auto";
-  document.getElementById("send-btn").disabled=true;
-  document.getElementById("chips-wrap").style.display="none";
-  loading=true;
+  // Adiciona ao histórico no formato Claude
+  historico[modo].push({ role: "user", content: text });
+  exibeMsg("user", text);
+  input.value = ""; input.style.height = "auto";
+  document.getElementById("send-btn").disabled = true;
+  document.getElementById("chips-wrap").style.display = "none";
+  loading = true;
 
-  // Typing
-  const ci=document.getElementById("chat-inner");
-  const typDiv=document.createElement("div"); typDiv.className="msg"; typDiv.id="typing";
-  typDiv.innerHTML=`<div class="msg-avatar">📊</div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
-  ci.appendChild(typDiv); scrollBottom();
+  // Typing indicator
+  const ci = document.getElementById("chat-inner");
+  const typDiv = document.createElement("div");
+  typDiv.className = "msg"; typDiv.id = "typing";
+  typDiv.innerHTML = `<div class="msg-avatar">📊</div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  ci.appendChild(typDiv);
+  document.getElementById("chat-area").scrollTop = document.getElementById("chat-area").scrollHeight;
 
   try {
-    const systemPrompt = modo==="chat" ? SYSTEM_CHAT : SYSTEM_GERADOR;
+    const systemPrompt = modo === "chat" ? SYSTEM_CHAT : SYSTEM_GERADOR;
 
-    // Monta histórico no formato do Gemini
-    const contents = [
-      { role: "user", parts: [{ text: systemPrompt + "\n\nUsuário: " + text }] }
-    ];
-
-    // Se tiver histórico anterior, inclui
-    if (historico[modo].length > 1) {
-      const hist = historico[modo].slice(0, -1); // sem a última msg que já está no prompt
-      const geminiHist = hist.map(m => ({
-        role: m.role === "user" ? "user" : "model",
-        parts: [{ text: m.content }]
-      }));
-      contents.unshift(...geminiHist);
-      // Ajusta a última mensagem
-      contents[contents.length-1] = { role: "user", parts: [{ text: text }] };
-    }
-
-    const res = await fetch(
-      `/api/chat`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: systemPrompt }] },
-          contents: historico[modo].map(m => ({
-            role: m.role === "user" ? "user" : "model",
-            parts: [{ text: m.content }]
-          })),
-          generationConfig: { temperature: 0.7, maxOutputTokens: 1500 }
-        })
-      }
-    );
+    // Envia histórico completo no formato Claude para o proxy
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        system: systemPrompt,
+        messages: historico[modo] // [{role: "user"|"assistant", content: "..."}]
+      })
+    });
 
     const data = await res.json();
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Desculpe, tive um problema. Tente novamente.";
+    const reply = data.text || "Desculpe, tive um problema. Tente novamente.";
+
     document.getElementById("typing")?.remove();
-    addMsg(modo,"assistant",reply);
+    historico[modo].push({ role: "assistant", content: reply });
+    exibeMsg("assistant", reply);
+
   } catch(e) {
     document.getElementById("typing")?.remove();
-    addMsg(modo,"assistant","Erro de conexão. Verifique sua chave da API e tente novamente.");
+    const errMsg = "Erro de conexão. Tente novamente.";
+    historico[modo].push({ role: "assistant", content: errMsg });
+    exibeMsg("assistant", errMsg);
   } finally {
-    loading=false;
-    document.getElementById("send-btn").disabled=false;
+    loading = false;
+    document.getElementById("send-btn").disabled = false;
   }
 }
 </script>
