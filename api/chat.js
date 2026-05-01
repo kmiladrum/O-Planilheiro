@@ -8,21 +8,7 @@ export default async function handler(req, res) {
     let body = req.body;
     if (typeof body === 'string') body = JSON.parse(body);
 
-    const system = body.system || '';
-    const messages = body.messages || [];
-
-    // Converte formato do histórico para o Claude
-    const claudeMessages = messages.map(m => ({
-      role: m.role === 'model' ? 'assistant' : 'user',
-      content: m.parts?.[0]?.text || m.content || ''
-    })).filter(m => m.content);
-
-    // Garante que começa com mensagem do usuário
-    const filtered = [];
-    for (const m of claudeMessages) {
-      if (filtered.length === 0 && m.role !== 'user') continue;
-      filtered.push(m);
-    }
+    const { system, messages } = body;
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -35,17 +21,16 @@ export default async function handler(req, res) {
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 1500,
         system: system,
-        messages: filtered
+        messages: messages
       })
     });
 
     const data = await response.json();
-    console.log('Status:', response.status, 'Data:', JSON.stringify(data).slice(0, 300));
-
+    console.log('Status:', response.status, JSON.stringify(data).slice(0, 300));
     const text = data.content?.[0]?.text || 'Sem resposta.';
     res.status(200).json({ text });
 
-  } catch(err) {
+  } catch (err) {
     console.error('ERRO:', err.message);
     res.status(500).json({ error: err.message });
   }
