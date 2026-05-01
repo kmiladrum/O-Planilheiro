@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>O Planilheiro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -395,6 +396,19 @@ body {
 }
 
 ::-webkit-scrollbar { width: 4px; }
+.btn-download {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 14px;
+  padding: 11px 20px;
+  background: var(--green);
+  color: white; border: none; border-radius: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(26,122,60,0.2);
+}
+.btn-download:hover { background: var(--green2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(26,122,60,0.3); }
+.btn-download svg { flex-shrink: 0; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
 
 @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
@@ -506,48 +520,49 @@ Você também resolve: erros (#VALOR!, #REF!, #N/D, #DIV/0!), medidas DAX, tabel
 
 Responda sempre em português do Brasil. Use linguagem simples, sem jargão técnico. Seja amigável e paciente.`;
 
-const SYSTEM_GERADOR = `Você é o Planilheiro, especialista em criar planilhas avançadas e dashboards profissionais.
+const SYSTEM_GERADOR = `Você é o Planilheiro, especialista em criar planilhas avançadas prontas para uso no Excel.
 
-**FLUXO OBRIGATÓRIO:**
+FLUXO OBRIGATÓRIO:
 
-**Passo 1 — Entender o objetivo:**
-Antes de qualquer coisa, faça as seguintes perguntas (uma de cada vez, de forma natural):
-1. Qual é o objetivo principal da planilha ou dashboard?
-2. Quais dados você já tem ou vai inserir?
+Passo 1 - Entender o objetivo:
+Faça as perguntas abaixo de forma natural e amigável (uma de cada vez):
+1. Qual é o objetivo principal da planilha?
+2. Quais informações/dados serão inseridos?
 3. É para uso pessoal ou empresarial?
-4. Tem alguma preferência de cores ou visual?
+4. Tem alguma preferência de organização ou visual?
 
-**Passo 2 — Montar a estrutura:**
-Após entender o objetivo, entregue:
+Passo 2 - Confirmar e montar:
+Após entender tudo, explique em texto simples a estrutura que vai criar (abas, colunas, fórmulas principais).
 
-Para PLANILHAS EXCEL:
-- Estrutura completa com todas as abas necessárias
-- Cabeçalhos e colunas de cada aba
-- Todas as fórmulas prontas em blocos de código
-- Formatação condicional sugerida
-- Tabelas dinâmicas se aplicável
-- Validações de dados
+Passo 3 - Gerar o arquivo Excel:
+SEMPRE ao final gere um bloco de código com a tag xlsx-json contendo a estrutura EXATA abaixo:
 
-Para DASHBOARDS POWER BI:
-- Modelo de dados (tabelas fato e dimensão)
-- Relacionamentos entre tabelas
-- Medidas DAX necessárias em blocos de código
-- Visuais sugeridos para o dashboard
-- Filtros e segmentações recomendadas
+XLSX_JSON_START
+{
+  "filename": "nome-do-arquivo",
+  "sheets": [
+    {
+      "name": "Nome da Aba",
+      "headers": ["Coluna1", "Coluna2", "Coluna3"],
+      "rows": [
+        ["dado1", "dado2", "=FORMULA(A2)"],
+        ["dado3", "dado4", "=FORMULA(A3)"]
+      ]
+    }
+  ]
+}
+XLSX_JSON_END
 
-**Passo 3 — Oferecer o arquivo:**
-Ao final, SEMPRE diga:
-"✅ Posso gerar agora um arquivo Excel (.xlsx) pronto com essa estrutura, fórmulas e dados de exemplo — é só abrir e adaptar para seus dados reais. Quer que eu gere?"
+REGRAS para o JSON:
+- filename: nome do arquivo sem espaços (use hifens)
+- sheets: array com TODAS as abas da planilha
+- headers: cabeçalhos em português, claros e descritivos
+- rows: inclua pelo menos 5 linhas de EXEMPLO com dados fictícios realistas
+- Nas colunas calculadas, coloque a formula Excel real (ex: =B2*C2, =SOMA(B2:B100), =SE(A2>0,"Sim","Nao"))
+- Sempre crie uma aba chamada "Instrucoes" como primeira aba explicando como usar a planilha
+- Dados de exemplo devem ser realistas para o usuario entender o padrao
 
-Se a pessoa confirmar, gere o arquivo em formato CSV estruturado com:
-- Todos os cabeçalhos definidos
-- Fórmulas nos campos corretos (escritas como texto explicativo nas células)
-- Dados de exemplo em pelo menos 5 linhas
-- Instruções de uso na primeira aba
-
-Forneça o conteúdo do CSV completo em um bloco de código para a pessoa copiar.
-
-Responda sempre em português do Brasil. Seja detalhado e personalizado para o objetivo do usuário.`;
+Responda sempre em portugues do Brasil. Seja amigavel, detalhado e personalizado.`;
 
 const CHIPS_CHAT    = ["Como fazer PROCV entre duas abas?","Erro #N/D no PROCV, como corrigir?","Fórmula para somar por mês","Como travar célula com F4?","DAX de % crescimento mês a mês","Coluna calculada no Power BI"];
 const CHIPS_GERADOR = ["Controle financeiro pessoal","Controle de estoque com alertas","Dashboard de vendas","Fluxo de caixa empresarial","Dashboard RH com turnover","Metas vs resultado Power BI"];
@@ -621,11 +636,50 @@ function exibeMsg(role, content) {
   }
   const bubble = document.createElement("div");
   bubble.className = "msg-bubble";
-  bubble.innerHTML = formatMsg(content);
+
+  // Detecta e extrai JSON do Excel
+  const xlsxMatch = content.match(/XLSX_JSON_START([\s\S]*?)XLSX_JSON_END/);
+  if (xlsxMatch && role === "assistant") {
+    const cleanContent = content.replace(/XLSX_JSON_START[\s\S]*?XLSX_JSON_END/, "").trim();
+    bubble.innerHTML = formatMsg(cleanContent);
+    try {
+      const jsonData = JSON.parse(xlsxMatch[1].trim());
+      const btn = document.createElement("button");
+      btn.className = "btn-download";
+      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar planilha Excel (.xlsx)`;
+      btn.onclick = () => gerarExcel(jsonData);
+      bubble.appendChild(btn);
+    } catch(e) {
+      console.error("Erro ao parsear JSON do Excel:", e);
+    }
+  } else {
+    bubble.innerHTML = formatMsg(content);
+  }
+
   div.appendChild(bubble);
   ci.appendChild(div);
   document.getElementById("chat-area").scrollTop = 999999;
   document.getElementById("chips-area").style.display = historico[modo].length === 0 ? "block" : "none";
+}
+
+function gerarExcel(data) {
+  try {
+    const wb = XLSX.utils.book_new();
+    data.sheets.forEach(sheet => {
+      const wsData = [sheet.headers, ...sheet.rows];
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      // Largura automática das colunas
+      const colWidths = sheet.headers.map((h, i) => ({
+        wch: Math.max(h.length, ...sheet.rows.map(r => String(r[i] || "").length), 12)
+      }));
+      ws["!cols"] = colWidths;
+      XLSX.utils.book_append_sheet(wb, ws, sheet.name);
+    });
+    XLSX.writeFile(wb, (data.filename || "planilheiro") + ".xlsx");
+  } catch(e) {
+    alert("Erro ao gerar o arquivo. Tente novamente.");
+    console.error(e);
+  }
 }
 
 function formatMsg(text) {
