@@ -626,24 +626,41 @@ function exibeMsg(role, content) {
   const bubble = document.createElement("div");
   bubble.className = "msg-bubble";
 
-  // Detecta bloco ```planilha e gera botão de download
-  const planilhaMatch = content.match(/```planilha\s*([\s\S]*?)```/);
-  if (planilhaMatch && role === "assistant") {
-    const cleanContent = content.replace(/```planilha[\s\S]*?```/, "").trim();
-    bubble.innerHTML = formatMsg(cleanContent);
-    try {
-      const jsonData = JSON.parse(planilhaMatch[1].trim());
-      const btn = document.createElement("button");
-      btn.className = "btn-download";
-      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar planilha Excel (.xlsx)`;
-      btn.onclick = () => gerarExcel(jsonData);
-      bubble.appendChild(btn);
-    } catch(e) {
-      console.error("Erro ao parsear JSON:", e);
-      bubble.innerHTML = formatMsg(content);
+  // Detecta bloco planilha e gera botão de download
+  const TAG_START = "```planilha";
+  const TAG_END = "```";
+  const startIdx = content.indexOf(TAG_START);
+  let jsonData = null;
+  let cleanContent = content;
+
+  if (startIdx !== -1 && role === "assistant") {
+    const afterStart = content.indexOf("\n", startIdx) + 1;
+    const endIdx = content.indexOf(TAG_END, afterStart);
+    if (endIdx !== -1) {
+      const jsonStr = content.substring(afterStart, endIdx).trim();
+      cleanContent = (content.substring(0, startIdx) + content.substring(endIdx + 3)).trim();
+      try {
+        jsonData = JSON.parse(jsonStr);
+      } catch(e) {
+        // Tenta limpar o JSON antes de parsear
+        try {
+          const cleaned = jsonStr.replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
+          jsonData = JSON.parse(cleaned);
+        } catch(e2) {
+          console.error("Erro JSON:", e2, jsonStr.slice(0, 200));
+        }
+      }
     }
-  } else {
-    bubble.innerHTML = formatMsg(content);
+  }
+
+  bubble.innerHTML = formatMsg(cleanContent);
+
+  if (jsonData && role === "assistant") {
+    const btn = document.createElement("button");
+    btn.className = "btn-download";
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar planilha Excel (.xlsx)';
+    btn.onclick = () => gerarExcel(jsonData);
+    bubble.appendChild(btn);
   }
 
   div.appendChild(bubble);
