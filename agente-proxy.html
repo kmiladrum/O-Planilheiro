@@ -270,76 +270,41 @@ const SYSTEM_GERADOR = `Você é o Planilheiro Pro, um agente especialista em Ex
 
 FLUXO OBRIGATÓRIO:
 
-Passo 1 – Entender a necessidade (UMA pergunta por vez):
+Passo 1 – Entender a necessidade (UMA pergunta por vez, de forma natural):
 1. Qual tipo de planilha? (financeiro pessoal, vendas, estoque, fluxo de caixa, projetos, RH, outro)
 2. Uso pessoal ou empresarial?
 3. Quais dados/categorias principais quer controlar?
 4. Período: mensal, semanal, anual?
 
 Passo 2 – Confirmar estrutura:
-Descreva em 2-3 frases o que vai entregar. Peça confirmação.
+Descreva em 2-3 frases o que vai entregar. Peça confirmação antes de gerar.
 
-Passo 3 – Gerar:
-Diga "Sua planilha está pronta! 🎉" e gere OBRIGATORIAMENTE um bloco:
+Passo 3 – Gerar o arquivo:
+Escreva "Sua planilha está pronta! 🎉" e logo após gere EXATAMENTE o seguinte bloco (use EXATAMENTE essa tag de abertura):
 
 \`\`\`planilha-pro
-JSON_AQUI
+{"palette":"ocean","filename":"nome-arquivo","dashboard":{"title":"Titulo","subtitle":"Subtitulo 2025","kpis":[{"label":"KPI","formula":"=Dados!C16","format":"currency","sublabel":"Jan-Dez","accent":"00BFA5"}]},"sheets":[{"name":"Dados","headers":["Mes","Receita","Despesa","Lucro"],"col_types":["text","currency","currency","currency"],"formula_cols":[3],"totals_row":true,"rows":[["Janeiro",5500,3200,"=C4-D4"],["Fevereiro",6000,3400,"=C5-D5"],["Marco",5800,3100,"=C6-D6"],["Abril",6200,3300,"=C7-D7"],["Maio",6500,3500,"=C8-D8"],["Junho",7000,3800,"=C9-D9"],["Julho",6800,3600,"=C10-D10"],["Agosto",7200,3900,"=C11-D11"],["Setembro",7500,4000,"=C12-D12"],["Outubro",7100,3800,"=C13-D13"],["Novembro",7800,4200,"=C14-D14"],["Dezembro",8500,4600,"=C15-D15"]]}]}
 \`\`\`
 
-ESTRUTURA EXATA DO JSON (sem comentários, JSON 100% válido):
-{
-  "palette": "ocean",
-  "filename": "nome-do-arquivo",
-  "dashboard": {
-    "title": "Título do Dashboard",
-    "subtitle": "Subtítulo descritivo · 2025",
-    "kpis": [
-      {"label": "Nome KPI", "formula": "=Dados!E16", "format": "currency", "sublabel": "Acumulado Jan-Dez", "accent": "00BFA5"},
-      {"label": "Nome KPI 2", "formula": "=Dados!F16", "format": "percent", "sublabel": "Média anual", "accent": "F5A623"}
-    ]
-  },
-  "sheets": [
-    {
-      "name": "NomeDaAba",
-      "headers": ["Mês", "Receita", "Despesa", "Lucro", "Margem %"],
-      "col_types": ["text", "currency", "currency", "currency", "percent"],
-      "formula_cols": [3, 4],
-      "totals_row": true,
-      "rows": [
-        ["Janeiro", 5500, 3200, "=C4-D4", "=(C4-D4)/C4"],
-        ["Fevereiro", 6000, 3400, "=C5-D5", "=(C5-D5)/C5"],
-        ["Março", 5800, 3100, "=C6-D6", "=(C6-D6)/C6"],
-        ["Abril", 6200, 3300, "=C7-D7", "=(C7-D7)/C7"],
-        ["Maio", 6500, 3500, "=C8-D8", "=(C8-D8)/C8"],
-        ["Junho", 7000, 3800, "=C9-D9", "=(C9-D9)/C9"],
-        ["Julho", 6800, 3600, "=C10-D10", "=(C10-D10)/C10"],
-        ["Agosto", 7200, 3900, "=C11-D11", "=(C11-D11)/C11"],
-        ["Setembro", 7500, 4000, "=C12-D12", "=(C12-D12)/C12"],
-        ["Outubro", 7100, 3800, "=C13-D13", "=(C13-D13)/C13"],
-        ["Novembro", 7800, 4200, "=C14-D14", "=(C14-D14)/C14"],
-        ["Dezembro", 8500, 4600, "=C15-D15", "=(C15-D15)/C15"]
-      ]
-    }
-  ]
-}
+ATENÇÃO — REGRA DE OURO: O JSON deve estar em UMA ÚNICA LINHA, sem quebras de linha dentro do bloco. Exatamente como o exemplo acima.
 
-REGRAS CRÍTICAS:
-- palette: "ocean" (azul), "forest" (verde), "midnight" (roxo), "corporate" (corporativo azul)
-- filename: sem espaços, use hifens (ex: controle-financeiro-2025)
-- col_types por coluna: "text", "currency", "percent", "number", "date"
-- formula_cols: índices 0-based das colunas que contêm fórmulas (usuário NÃO edita)
-- totals_row: true para adicionar linha de TOTAL automática
-- kpis[].format: "currency", "percent", "number"
-- kpis[].formula: referencia a célula de TOTAL da aba (ex: "=Dados!C16" onde 16 = header(1) + 12 linhas de dados + 1 total + 2 linhas de offset do layout)
-- rows: SEMPRE 12 meses ou mínimo 8 itens com dados realistas
-- Fórmulas nas rows: referências relativas corretas para a linha Excel real (dados começam na linha 4 do Excel, pois há banner nas linhas 1-2 e header na 3)
-- Se precisar de múltiplas abas (ex: Receitas + Despesas separadas), adicione múltiplos objetos em "sheets"
-- JSON deve ser completamente válido: aspas duplas, sem trailing commas, sem comentários
+REGRAS DO JSON:
+- palette: "ocean" (azul-petróleo), "forest" (verde), "midnight" (roxo), "corporate" (azul corporativo)
+- filename: sem espaços, sem acentos, use hifens (ex: controle-financeiro-2025)
+- col_types por coluna: "text", "currency", "percent", "number"
+- formula_cols: lista de índices 0-based das colunas com fórmulas Excel
+- totals_row: sempre true
+- kpis[].format: "currency", "percent" ou "number"
+- kpis[].formula: referência à linha de TOTAL da aba. Os dados começam na linha 4 do Excel (linhas 1-2 são banner, linha 3 é cabeçalho). Com 12 meses de dados (linhas 4 a 15), o TOTAL fica na linha 16. Exemplo: "=Dados!C16"
+- rows: mínimo 12 linhas com dados realistas e fórmulas corretas
+- Fórmulas nas rows: linha 4 = primeiro dado, linha 15 = último (com 12 meses)
+- Sem acentos nas strings do JSON para evitar problemas de encoding
+- JSON 100% válido: aspas duplas, sem trailing commas, sem comentários
 
-SUGESTÃO DE PALETA POR TIPO:
-- Pessoal/Financeiro → "ocean" ou "forest"
-- Empresarial/Corporativo → "corporate"
-- Tecnologia/Moderno → "midnight"
+PALETA SUGERIDA:
+- Pessoal/Financeiro → "ocean" ou "forest"  
+- Empresarial → "corporate"
+- Moderno/Tech → "midnight"
 
 Responda sempre em português do Brasil.`;
 
@@ -410,36 +375,107 @@ function setMode(m){
 }
 
 // ═══════════════════════════════════════════════════════
-//  PARSE DO JSON DO CLAUDE
+//  PARSE DO JSON DO CLAUDE — parser robusto
 // ═══════════════════════════════════════════════════════
-function extrairJSON(text){
-  const OPEN="```planilha-pro";
-  const si=text.indexOf(OPEN);
-  if(si===-1) return null;
-  const after=text.substring(si+OPEN.length);
-  const ci=after.indexOf("```");
-  const raw=ci!==-1?after.substring(0,ci):after;
-  let s=raw.trim()
-    .replace(/\r\n|\n|\r|\t/g," ")
-    .replace(/[\u0000-\u001F\u007F-\u009F]/g," ")
-    .replace(/,\s*}/g,"}").replace(/,\s*]/g,"]")
-    .replace(/\s+/g," ").trim();
-  for(const attempt of [s, s.match(/\{.*\}/s)?.[0], s.replace(/'/g,'"')]){
-    if(!attempt) continue;
-    try{ const p=JSON.parse(attempt); if(p&&p.sheets) return p; }catch(e){}
+
+// Extrai o conteúdo bruto entre qualquer variação de bloco de código
+function extrairBlocoRaw(text){
+  // Aceita qualquer uma dessas tags que o Claude possa usar
+  const TAGS = ["```planilha-pro", "```json", "```planilha", "```"];
+  for(const tag of TAGS){
+    const si = text.indexOf(tag);
+    if(si === -1) continue;
+    const after = text.substring(si + tag.length);
+    // Pula primeira linha se for apenas o nome da linguagem
+    const firstNL = after.indexOf("\n");
+    const content = firstNL !== -1 ? after.substring(firstNL+1) : after;
+    const closeIdx = content.indexOf("```");
+    const raw = closeIdx !== -1 ? content.substring(0, closeIdx) : content;
+    if(raw.trim().startsWith("{")) return { raw: raw.trim(), tagStart: si, tagEnd: si + tag.length + (firstNL !== -1 ? firstNL+1 : 0) + (closeIdx !== -1 ? closeIdx + 3 : raw.length) };
   }
-  console.error("JSON parse falhou:", s.substring(0,400));
+  // Último recurso: tenta achar qualquer { } que pareça JSON com "sheets"
+  const m = text.match(/\{[\s\S]*?"sheets"[\s\S]*?\}/);
+  if(m) return { raw: m[0], tagStart: text.indexOf(m[0]), tagEnd: text.indexOf(m[0]) + m[0].length };
   return null;
 }
 
+function extrairJSON(text){
+  const found = extrairBlocoRaw(text);
+  if(!found) return null;
+  const raw = found.raw;
+
+  // Estratégia 1: parse direto (funciona se o JSON está bem formatado)
+  try{ const p=JSON.parse(raw); if(p&&p.sheets) return p; }catch(e){}
+
+  // Estratégia 2: limpeza conservadora — só remove chars de controle FORA de strings
+  try{
+    const cleaned = limpezaConservadora(raw);
+    const p = JSON.parse(cleaned);
+    if(p&&p.sheets) return p;
+  }catch(e){}
+
+  // Estratégia 3: limpeza agressiva — achata tudo em uma linha
+  try{
+    let s = raw
+      .replace(/[\u0000-\u001F\u007F-\u009F]/g, " ")
+      .replace(/,\s*}/g,"}").replace(/,\s*]/g,"]")
+      .replace(/\s+/g," ").trim();
+    const p = JSON.parse(s);
+    if(p&&p.sheets) return p;
+  }catch(e){}
+
+  // Estratégia 4: regex para extrair o objeto JSON
+  try{
+    const m = raw.match(/(\{[\s\S]*\})/);
+    if(m){
+      const p = JSON.parse(m[1]);
+      if(p&&p.sheets) return p;
+    }
+  }catch(e){}
+
+  console.error("[Planilheiro] JSON parse falhou. Raw:", raw.substring(0,500));
+  return null;
+}
+
+// Limpeza que preserva conteúdo dentro de strings JSON
+function limpezaConservadora(str){
+  let result = "";
+  let inString = false;
+  let escaped = false;
+  for(let i=0;i<str.length;i++){
+    const c = str[i];
+    if(escaped){ result += c; escaped=false; continue; }
+    if(c==="\\" && inString){ result += c; escaped=true; continue; }
+    if(c==='"'){ inString=!inString; result+=c; continue; }
+    if(inString){
+      // Dentro de string: substitui quebras de linha por espaço (JSON não permite literal \n em strings)
+      if(c==="\n"||c==="\r"){ result+=" "; continue; }
+      result+=c;
+    } else {
+      // Fora de string: remove chars de controle mas preserva estrutura
+      if(c==="\n"||c==="\r"||c==="\t"){ result+=" "; continue; }
+      result+=c;
+    }
+  }
+  return result;
+}
+
 function limparBloco(text){
-  const OPEN="```planilha-pro";
-  const si=text.indexOf(OPEN);
-  if(si===-1) return text;
-  const after=text.substring(si+OPEN.length);
-  const ci=after.indexOf("```");
-  const end=ci!==-1?si+OPEN.length+ci+3:text.length;
-  return (text.substring(0,si)+text.substring(end)).trim();
+  const found = extrairBlocoRaw(text);
+  if(!found) return text;
+  // Remove tudo desde a abertura do bloco até o fechamento
+  const TAGS = ["```planilha-pro", "```json", "```planilha", "```"];
+  for(const tag of TAGS){
+    const si = text.indexOf(tag);
+    if(si === -1) continue;
+    const after = text.substring(si + tag.length);
+    const ci = after.indexOf("```");
+    if(ci !== -1){
+      const end = si + tag.length + ci + 3;
+      return (text.substring(0, si) + text.substring(end)).trim();
+    }
+  }
+  return text;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -747,7 +783,12 @@ function exibeMsg(role, content){
   const bubble=document.createElement("div");
   bubble.className="msg-bubble";
 
-  const hasPro=role==="assistant"&&content.includes("```planilha-pro");
+  // Detecta se há bloco de planilha (qualquer tag) com JSON válido contendo "sheets"
+  const hasPro = role==="assistant" && (
+    content.includes("```planilha-pro") ||
+    // fallback: tem algum bloco de código com "sheets" dentro
+    (content.includes("\"sheets\"") && content.includes("```"))
+  );
 
   if(hasPro){
     const parsedPayload=extrairJSON(content);
@@ -804,7 +845,6 @@ function exibeMsg(role, content){
         btn.disabled=true;
         btn.textContent="⏳ Gerando arquivo...";
         try{
-          // Injeta a paleta selecionada pelo usuário no momento do clique
           parsedPayload.palette=selectedPalette;
           await gerarExcel(parsedPayload, selectedPalette);
           btn.innerHTML="✅ Download iniciado!";
@@ -826,8 +866,10 @@ function exibeMsg(role, content){
         }
       };
     } else {
-      btn.disabled=true;
-      btn.title="Erro ao processar. Peça ao Planilheiro para gerar novamente.";
+      // Parse falhou: botão de retry que pede ao Claude para regenerar
+      btn.textContent="🔄 Gerar novamente";
+      btn.style.background="#F5A623";
+      btn.onclick=()=>{ enviar("Por favor, gere a planilha novamente. Retorne o JSON em uma única linha dentro do bloco ```planilha-pro, sem quebras de linha no JSON."); };
     }
 
     cardActions.appendChild(btn);
@@ -835,8 +877,8 @@ function exibeMsg(role, content){
 
     if(!parsedPayload){
       const warn=document.createElement("div");
-      warn.style.cssText="padding:0 18px 14px;font-size:11px;color:#dc2626";
-      warn.textContent="⚠️ Erro ao processar a planilha. Por favor, peça para gerar novamente.";
+      warn.style.cssText="padding:0 18px 14px;font-size:11px;color:#92400e;background:#fffbeb;border-top:1px solid #fde68a;padding:10px 18px;";
+      warn.textContent="⚠️ Houve um problema ao processar o JSON. Clique em 'Gerar novamente' — o sistema vai corrigir automaticamente.";
       card.appendChild(warn);
     }
 
