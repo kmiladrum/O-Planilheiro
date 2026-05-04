@@ -191,6 +191,61 @@ body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',sans-
 /* OVERLAY */
 #hist-overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:190;display:none}
 
+/* TEMPLATES MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg);border:1px solid var(--border);border-radius:20px;width:100%;max-width:660px;max-height:80vh;overflow:hidden;display:flex;flex-direction:column;transform:translateY(10px);transition:transform .2s;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.modal-title{font-size:16px;font-weight:800;color:var(--txt)}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--txt3);padding:0;line-height:1}
+.modal-body{overflow-y:auto;padding:20px 24px}
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.tpl-card{background:var(--surface);border:1.5px solid var(--border2);border-radius:14px;padding:16px;cursor:pointer;transition:all .15s;text-align:left}
+.tpl-card:hover{border-color:var(--green2);background:var(--green-light);transform:translateY(-2px);box-shadow:var(--shadow2)}
+.tpl-icon{font-size:28px;margin-bottom:10px;display:block}
+.tpl-name{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:4px}
+.tpl-desc{font-size:11px;color:var(--txt3);line-height:1.5}
+.tpl-badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;margin-top:8px;letter-spacing:.04em}
+.tpl-badge.pro{background:var(--green-light);color:var(--green);border:1px solid var(--green-light2)}
+
+/* ONBOARDING */
+.onboard-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px}
+.onboard-card{background:var(--bg);border-radius:20px;width:100%;max-width:460px;padding:36px 36px 28px;box-shadow:0 12px 48px rgba(0,0,0,.2);animation:fadeUp .3s ease}
+.onboard-step-dots{display:flex;gap:6px;justify-content:center;margin-bottom:24px}
+.onboard-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);transition:all .2s}
+.onboard-dot.active{background:var(--green);width:24px;border-radius:4px}
+.onboard-icon{font-size:48px;text-align:center;display:block;margin-bottom:16px}
+.onboard-title{font-size:20px;font-weight:800;color:var(--txt);text-align:center;margin-bottom:8px;letter-spacing:-.3px}
+.onboard-text{font-size:14px;color:var(--txt3);text-align:center;line-height:1.7;margin-bottom:24px}
+.onboard-actions{display:flex;gap:8px;justify-content:center}
+.btn-onboard-skip{background:none;border:none;color:var(--txt3);font-size:13px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;padding:8px 12px}
+.btn-onboard-next{background:var(--green);color:white;border:none;border-radius:10px;padding:11px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s}
+.btn-onboard-next:hover{background:var(--green2)}
+
+/* CONTADOR DE PLANILHAS */
+.planilha-counter{display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--green-light);border:1px solid var(--green-light2);border-radius:100px;font-size:12px;font-weight:600;color:var(--green)}
+.counter-bar{width:60px;height:4px;background:var(--border2);border-radius:2px;overflow:hidden}
+.counter-fill{height:100%;background:var(--green);border-radius:2px;transition:width .4s ease}
+.counter-fill.warn{background:#F5A623}
+.counter-fill.danger{background:#E84855}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--txt);color:var(--bg);padding:10px 20px;border-radius:100px;font-size:13px;font-weight:600;z-index:500;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* PLANILHAS GERADAS LOG */
+.hist-gen-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:8px}
+.hist-gen-name{font-size:12px;font-weight:700;color:var(--txt);margin-bottom:2px}
+.hist-gen-meta{font-size:11px;color:var(--txt3)}
+
+/* SEARCH INPUT no histórico */
+.hist-search{width:100%;padding:8px 12px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:var(--txt);outline:none;margin-bottom:10px}
+.hist-search:focus{border-color:var(--green2)}
+.hist-tabs{display:flex;gap:4px;margin-bottom:12px}
+.hist-tab{flex:1;padding:6px;background:none;border:1px solid var(--border2);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:var(--txt3);transition:all .15s}
+.hist-tab.active{background:var(--green-light);border-color:var(--green-light2);color:var(--green)}
+
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -199,14 +254,52 @@ body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',sans-
 </head>
 <body>
 
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ONBOARDING -->
+<div class="onboard-overlay" id="onboard-overlay" style="display:none">
+  <div class="onboard-card">
+    <div class="onboard-step-dots" id="onboard-dots"></div>
+    <span class="onboard-icon" id="onboard-icon">👋</span>
+    <div class="onboard-title" id="onboard-title">Bem-vindo ao Planilheiro!</div>
+    <div class="onboard-text" id="onboard-text">Seu agente especialista em Excel e Google Planilhas. Vou te mostrar o que posso fazer em 3 passos rápidos.</div>
+    <div class="onboard-actions">
+      <button class="btn-onboard-skip" onclick="fecharOnboard()">Pular</button>
+      <button class="btn-onboard-next" id="onboard-next-btn" onclick="onboardNext()">Próximo →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TEMPLATES -->
+<div class="modal-overlay" id="tpl-overlay" onclick="fecharTemplates(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">⚡ Templates prontos</span>
+      <button class="modal-close" onclick="fecharTemplates()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--txt3);margin-bottom:16px">Clique para gerar instantaneamente — sem precisar descrever nada.</p>
+      <div class="tpl-grid" id="tpl-grid"></div>
+    </div>
+  </div>
+</div>
+
 <!-- HISTORICO OVERLAY -->
 <div id="hist-overlay" onclick="fecharHistorico()"></div>
 
 <!-- HISTORICO PANEL -->
 <div class="hist-panel" id="hist-panel">
   <div class="hist-header">
-    <span class="hist-title">📋 Minhas Fórmulas</span>
+    <span class="hist-title" id="hist-panel-title">📋 Meu Histórico</span>
     <button class="hist-close" onclick="fecharHistorico()">✕</button>
+  </div>
+  <div style="padding:12px 12px 0">
+    <div class="hist-tabs">
+      <button class="hist-tab active" id="htab-form" onclick="switchHistTab('form')">📐 Fórmulas</button>
+      <button class="hist-tab" id="htab-plan" onclick="switchHistTab('plan')">📊 Planilhas</button>
+    </div>
+    <input class="hist-search" id="hist-search" placeholder="Buscar..." oninput="renderHistBody()"/>
   </div>
   <div class="hist-body" id="hist-body"></div>
 </div>
@@ -244,7 +337,12 @@ body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',sans-
     </div>
     <div class="header-right">
       <span class="plan-badge" id="plan-badge">✦ Pro</span>
-      <button class="btn-icon" onclick="abrirHistorico()" title="Minhas fórmulas">📋</button>
+      <div class="planilha-counter" id="plan-counter" style="display:none" title="Planilhas geradas este mês">
+        <span id="counter-txt">0/10</span>
+        <div class="counter-bar"><div class="counter-fill" id="counter-fill" style="width:0%"></div></div>
+      </div>
+      <button class="btn-icon" id="btn-tpl" onclick="abrirTemplates()" title="Templates prontos" style="display:none">⚡</button>
+      <button class="btn-icon" onclick="abrirHistorico()" title="Histórico">📋</button>
       <button class="btn-icon" id="btn-dark" onclick="toggleDark()" title="Modo escuro">🌙</button>
       <a href="planilheiro-landing-final.html" class="btn-upgrade" id="btn-upgrade">Upgrade Pro</a>
       <button class="btn-sair" onclick="sair()">Sair</button>
@@ -344,7 +442,7 @@ COMPORTAMENTO:
 - Após entregar fórmula, sugira variações úteis
 - NÃO entregue arquivos — apenas fórmulas e explicações`;
 
-const SYSTEM_GERADOR = `Você é o Planilheiro Pro, especialista em criar planilhas Excel profissionais completas. Responda em português do Brasil.
+const SYSTEM_GERADOR = `Você é o Planilheiro Pro, especialista em criar planilhas Excel profissionais e totalmente automatizadas. Responda em português do Brasil.
 
 FLUXO:
 Passo 1 – Colete informações (UMA pergunta por vez):
@@ -355,32 +453,180 @@ Passo 1 – Colete informações (UMA pergunta por vez):
 
 Passo 2 – Confirme a estrutura em 2-3 frases e peça confirmação.
 
-Passo 3 – Ao gerar, diga "Sua planilha está pronta! 🎉" e inclua o bloco abaixo.
+Passo 3 – Ao gerar, diga "Sua planilha está pronta! 🎉" e inclua EXATAMENTE este bloco:
 
-BLOCO OBRIGATÓRIO — use EXATAMENTE esta tag:
 \`\`\`planilha-pro
-{"palette":"ocean","filename":"nome-arquivo","dashboard":{"title":"Titulo","subtitle":"Subtitulo 2025","kpis":[{"label":"KPI","formula":"=Dados!C16","format":"currency","sublabel":"Jan-Dez","accent":"00BFA5"}]},"sheets":[{"name":"Dados","headers":["Mes","Receita","Despesa","Lucro"],"col_types":["text","currency","currency","currency"],"formula_cols":[3],"totals_row":true,"rows":[["Janeiro",5500,3200,"=C4-D4"],["Fevereiro",6000,3400,"=C5-D5"],["Marco",5800,3100,"=C6-D6"],["Abril",6200,3300,"=C7-D7"],["Maio",6500,3500,"=C8-D8"],["Junho",7000,3800,"=C9-D9"],["Julho",6800,3600,"=C10-D10"],["Agosto",7200,3900,"=C11-D11"],["Setembro",7500,4000,"=C12-D12"],["Outubro",7100,3800,"=C13-D13"],["Novembro",7800,4200,"=C14-D14"],["Dezembro",8500,4600,"=C15-D15"]]}]}
+JSON_AQUI
 \`\`\`
 
-REGRA DE OURO: JSON em UMA ÚNICA LINHA. Sem quebras de linha dentro do bloco.
+ESTRUTURA DO JSON (UMA ÚNICA LINHA, sem quebras):
+
+EXEMPLO CORRETO para controle financeiro:
+{"palette":"ocean","filename":"controle-financeiro","dashboard":{"title":"Controle Financeiro","subtitle":"Visão anual 2025","kpis":[{"label":"Receita Total","formula":"=Dados!B16","format":"currency","sublabel":"Jan-Dez","accent":"00BFA5"},{"label":"Despesas","formula":"=Dados!C16","format":"currency","sublabel":"Jan-Dez","accent":"E84855"},{"label":"Lucro","formula":"=Dados!D16","format":"currency","sublabel":"Jan-Dez","accent":"F5A623"},{"label":"Margem","formula":"=Dados!E16","format":"percent","sublabel":"Media anual","accent":"6C63FF"}]},"sheets":[{"name":"Dados","headers":["Mes","Receita","Despesas","Lucro","Margem %"],"col_types":["text","currency","currency","currency","percent"],"formula_cols":[3,4],"formula_expressions":["=B{ROW}-C{ROW}","=(B{ROW}-C{ROW})/B{ROW}"],"totals_row":true,"rows":[["Janeiro",5500,3200,0,0],["Fevereiro",6000,3400,0,0],["Marco",5800,3100,0,0],["Abril",6200,3300,0,0],["Maio",6500,3500,0,0],["Junho",7000,3800,0,0],["Julho",6800,3600,0,0],["Agosto",7200,3900,0,0],["Setembro",7500,4000,0,0],["Outubro",7100,3800,0,0],["Novembro",7800,4200,0,0],["Dezembro",8500,4600,0,0]]}]}
+\`\`\`
+
+CAMPO NOVO OBRIGATÓRIO: formula_expressions
+- Lista de strings com a fórmula de CADA coluna em formula_cols, na mesma ordem
+- Use {ROW} como placeholder para o número da linha — o sistema substitui automaticamente
+- Exemplos:
+  * Lucro = Receita - Despesa: "=B{ROW}-C{ROW}"
+  * Total de colunas: "=SUM(B{ROW}:E{ROW})"
+  * Margem %: "=(B{ROW}-C{ROW})/B{ROW}"
+  * Saldo acumulado: "=D{ROW-1}+B{ROW}-C{ROW}" (NÃO use isso — use somente refs simples)
+- Nas rows, coloque 0 nas colunas de fórmula — o sistema gera as fórmulas reais
 
 REGRAS:
 - palette: "ocean","forest","midnight","corporate"
-- filename: sem espaços, sem acentos, hifens (ex: controle-financeiro-2025)
+- filename: sem espaços, sem acentos, hifens
 - col_types: "text","currency","percent","number"
-- formula_cols: índices 0-based das colunas com fórmulas Excel
+- formula_cols: índices 0-based das colunas calculadas (NÃO de entrada)
 - totals_row: sempre true
-- kpis[].format: "currency","percent","number"
-- kpis[].formula: linha TOTAL = linha 4 (1º dado) + N linhas de dados. Ex 12 meses → total linha 16 → "=Dados!C16"
-- rows: mínimo 12 linhas, dados realistas
-- Fórmulas: linha 4=jan, 5=fev...15=dez. Ex: "=C4-D4" para lucro de janeiro
-- JSON 100% válido: aspas duplas, sem trailing commas`;
+- kpis[].formula: ex "=Dados!B16" — B=coluna, 16=linha do total (4 + 12 linhas + linha total)
+- rows: 12 meses (ou itens adequados), valores numéricos realistas nas colunas de entrada, 0 nas de fórmula
+- JSON 100% válido: aspas duplas, sem trailing commas, SEM quebras de linha
+
+PALETA: "ocean" pessoal/financeiro · "forest" natural/orgânico · "corporate" empresarial · "midnight" tech/moderno`;
+
 
 // ════════════════════════════════════════════════════════
 //  ESTADO
 // ════════════════════════════════════════════════════════
 let plano=null, modo="chat", loading=false;
 let historico={chat:[],gerador:[]};
+let histTab="form";
+
+// ════════════════════════════════════════════════════════
+//  LIMITES
+// ════════════════════════════════════════════════════════
+const LIMITE_PLAN_PRO=20;
+function getMes(){return new Date().toISOString().slice(0,7);}
+function getPlanilhasGeradas(){try{const d=JSON.parse(localStorage.getItem("pl_gen")||"{}");return d.mes===getMes()?(d.count||0):0;}catch{return 0;}}
+function addPlanilhaGerada(){const count=getPlanilhasGeradas()+1;localStorage.setItem("pl_gen",JSON.stringify({mes:getMes(),count}));atualizarContador();return count;}
+function atualizarContador(){
+  if(plano!=="pro")return;
+  const count=getPlanilhasGeradas();const max=LIMITE_PLAN_PRO;const pct=Math.min((count/max)*100,100);
+  const el=document.getElementById("plan-counter");if(!el)return;
+  const fill=document.getElementById("counter-fill");
+  document.getElementById("counter-txt").textContent=count+"/"+max+" planilhas";
+  fill.style.width=pct+"%";
+  fill.className="counter-fill"+(pct>=100?" danger":pct>=70?" warn":"");
+  el.style.display=count>0?"flex":"none";
+}
+function podeCriarPlanilha(){return plano==="pro"&&getPlanilhasGeradas()<LIMITE_PLAN_PRO;}
+function salvarPlanilhaLog(nome,palette,abas){
+  try{const logs=JSON.parse(localStorage.getItem("pl_genlog")||"[]");logs.unshift({nome,palette,abas,data:new Date().toLocaleDateString("pt-BR"),hora:new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})});if(logs.length>100)logs.pop();localStorage.setItem("pl_genlog",JSON.stringify(logs));}catch(e){}
+}
+function getPlanilhasLog(){try{return JSON.parse(localStorage.getItem("pl_genlog")||"[]");}catch{return[];}}
+
+// ════════════════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════════════════
+let _toastTimer;
+function showToast(msg,dur=2800){
+  const t=document.getElementById("toast");if(!t)return;
+  t.textContent=msg;t.classList.add("show");
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(()=>t.classList.remove("show"),dur);
+}
+
+// ════════════════════════════════════════════════════════
+//  ONBOARDING
+// ════════════════════════════════════════════════════════
+const ONBOARD_STEPS=[
+  {icon:"👋",title:"Bem-vindo ao Planilheiro!",text:"Seu agente especialista em Excel e Google Planilhas. Vou te mostrar como aproveitar ao máximo em 3 passos rápidos."},
+  {icon:"💬",title:"Tire dúvidas de fórmulas",text:"Cole qualquer fórmula com erro, descreva o problema ou faça uma pergunta. Diagnostico erros #VALOR!, #REF!, #N/D e explico passo a passo."},
+  {icon:"⚡",title:"Gere planilhas completas",text:"No Plano Pro, crie arquivos Excel com dashboard, KPIs, fórmulas automáticas e 4 temas — em segundos. Ou use os 6 templates prontos!"},
+  {icon:"📋",title:"Histórico sempre disponível",text:"Todas as suas fórmulas e planilhas ficam salvas. Clique em 📋 no topo para acessar e reutilizar a qualquer momento."},
+];
+let _onboardStep=0;
+function iniciarOnboard(){
+  if(localStorage.getItem("pl_onboard_done"))return;
+  _onboardStep=0;renderOnboardStep();
+  document.getElementById("onboard-overlay").style.display="flex";
+}
+function renderOnboardStep(){
+  const s=ONBOARD_STEPS[_onboardStep];
+  document.getElementById("onboard-icon").textContent=s.icon;
+  document.getElementById("onboard-title").textContent=s.title;
+  document.getElementById("onboard-text").textContent=s.text;
+  const isLast=_onboardStep===ONBOARD_STEPS.length-1;
+  document.getElementById("onboard-next-btn").textContent=isLast?"Começar! 🚀":"Próximo →";
+  const dots=document.getElementById("onboard-dots");
+  dots.innerHTML=ONBOARD_STEPS.map((_,i)=>`<div class="onboard-dot${i===_onboardStep?" active":""}"></div>`).join("");
+}
+function onboardNext(){if(_onboardStep<ONBOARD_STEPS.length-1){_onboardStep++;renderOnboardStep();}else{fecharOnboard();}}
+function fecharOnboard(){document.getElementById("onboard-overlay").style.display="none";localStorage.setItem("pl_onboard_done","1");}
+
+// ════════════════════════════════════════════════════════
+//  TEMPLATES PRONTOS
+// ════════════════════════════════════════════════════════
+const TEMPLATES=[
+  {icon:"💰",name:"Controle Financeiro Pessoal",desc:"Receitas, despesas e saldo mensal",palette:"ocean",payload:{"palette":"ocean","filename":"controle-financeiro-pessoal","dashboard":{"title":"Controle Financeiro Pessoal","subtitle":"Receitas, Despesas e Saldo · 2025","kpis":[{"label":"Receita Total","formula":"=Dados!B16","format":"currency","sublabel":"Jan-Dez","accent":"00BFA5"},{"label":"Despesas","formula":"=Dados!C16","format":"currency","sublabel":"Jan-Dez","accent":"E84855"},{"label":"Saldo","formula":"=Dados!D16","format":"currency","sublabel":"Jan-Dez","accent":"F5A623"},{"label":"Margem","formula":"=Dados!E16","format":"percent","sublabel":"Media","accent":"6C63FF"}]},"sheets":[{"name":"Dados","headers":["Mes","Receita","Despesas","Saldo","Margem %"],"col_types":["text","currency","currency","currency","percent"],"formula_cols":[3,4],"formula_expressions":["=B{ROW}-C{ROW}","=(B{ROW}-C{ROW})/B{ROW}"],"totals_row":true,"rows":[["Janeiro",5500,3200,0,0],["Fevereiro",6000,3400,0,0],["Marco",5800,3100,0,0],["Abril",6200,3300,0,0],["Maio",6500,3500,0,0],["Junho",7000,3800,0,0],["Julho",6800,3600,0,0],["Agosto",7200,3900,0,0],["Setembro",7500,4000,0,0],["Outubro",7100,3800,0,0],["Novembro",7800,4200,0,0],["Dezembro",8500,4600,0,0]]}]}},
+  {icon:"📦",name:"Controle de Estoque",desc:"Entradas, saídas, saldo e alertas",palette:"forest",payload:{"palette":"forest","filename":"controle-estoque","dashboard":{"title":"Controle de Estoque","subtitle":"Entradas, Saidas e Saldo · 2025","kpis":[{"label":"Total Entradas","formula":"=Estoque!C16","format":"number","sublabel":"Unidades","accent":"2EC863"},{"label":"Total Saidas","formula":"=Estoque!D16","format":"number","sublabel":"Unidades","accent":"E84855"},{"label":"Saldo Atual","formula":"=Estoque!E16","format":"number","sublabel":"Em estoque","accent":"F5A623"}]},"sheets":[{"name":"Estoque","headers":["Produto","Estoque Inicial","Entradas","Saidas","Saldo","Status"],"col_types":["text","number","number","number","number","text"],"formula_cols":[4,5],"formula_expressions":["=B{ROW}+C{ROW}-D{ROW}","=SE(E{ROW}<10,\"CRITICO\",\"OK\")"],"totals_row":true,"rows":[["Produto A",100,50,30,0,""],["Produto B",80,20,60,0,""],["Produto C",200,100,80,0,""],["Produto D",50,10,45,0,""],["Produto E",150,60,40,0,""],["Produto F",60,15,55,0,""],["Produto G",120,40,35,0,""],["Produto H",90,25,70,0,""],["Produto I",300,150,120,0,""],["Produto J",40,5,38,0,""],["Produto K",180,70,50,0,""],["Produto L",75,30,60,0,""]]}]}},
+  {icon:"📈",name:"Dashboard de Vendas",desc:"Meta vs realizado e atingimento mensal",palette:"corporate",payload:{"palette":"corporate","filename":"dashboard-vendas","dashboard":{"title":"Dashboard de Vendas","subtitle":"Meta vs Realizado · 2025","kpis":[{"label":"Total Vendido","formula":"=Vendas!C16","format":"currency","sublabel":"Jan-Dez","accent":"2E75B6"},{"label":"Total Meta","formula":"=Vendas!B16","format":"currency","sublabel":"Jan-Dez","accent":"ED7D31"},{"label":"Atingimento","formula":"=Vendas!D16","format":"percent","sublabel":"Media","accent":"2EC863"},{"label":"Variacao","formula":"=Vendas!E16","format":"currency","sublabel":"Acima/abaixo","accent":"6C63FF"}]},"sheets":[{"name":"Vendas","headers":["Mes","Meta","Realizado","Atingimento %","Variacao"],"col_types":["text","currency","currency","percent","currency"],"formula_cols":[3,4],"formula_expressions":["=C{ROW}/B{ROW}","=C{ROW}-B{ROW}"],"totals_row":true,"rows":[["Janeiro",50000,48000,0,0],["Fevereiro",52000,55000,0,0],["Marco",48000,46000,0,0],["Abril",55000,58000,0,0],["Maio",60000,62000,0,0],["Junho",58000,54000,0,0],["Julho",62000,65000,0,0],["Agosto",65000,68000,0,0],["Setembro",70000,72000,0,0],["Outubro",68000,66000,0,0],["Novembro",72000,78000,0,0],["Dezembro",80000,85000,0,0]]}]}},
+  {icon:"💸",name:"Fluxo de Caixa",desc:"Entradas, saídas e saldo acumulado",palette:"midnight",payload:{"palette":"midnight","filename":"fluxo-de-caixa","dashboard":{"title":"Fluxo de Caixa","subtitle":"Entradas e Saidas · 2025","kpis":[{"label":"Total Entradas","formula":"=Fluxo!B16","format":"currency","sublabel":"Jan-Dez","accent":"6C63FF"},{"label":"Total Saidas","formula":"=Fluxo!C16","format":"currency","sublabel":"Jan-Dez","accent":"FF6584"},{"label":"Resultado","formula":"=Fluxo!D16","format":"currency","sublabel":"Liquido","accent":"F5A623"},{"label":"Saldo Final","formula":"=Fluxo!E16","format":"currency","sublabel":"Acumulado","accent":"00BFA5"}]},"sheets":[{"name":"Fluxo","headers":["Mes","Entradas","Saidas","Resultado","Saldo Acumulado"],"col_types":["text","currency","currency","currency","currency"],"formula_cols":[3,4],"formula_expressions":["=B{ROW}-C{ROW}","=SUM(D4:D{ROW})"],"totals_row":true,"rows":[["Janeiro",45000,38000,0,0],["Fevereiro",48000,41000,0,0],["Marco",42000,36000,0,0],["Abril",52000,44000,0,0],["Maio",55000,47000,0,0],["Junho",58000,49000,0,0],["Julho",51000,43000,0,0],["Agosto",60000,51000,0,0],["Setembro",63000,53000,0,0],["Outubro",57000,48000,0,0],["Novembro",65000,55000,0,0],["Dezembro",72000,61000,0,0]]}]}},
+  {icon:"👥",name:"Gestão de RH",desc:"Headcount, admissões, demissões e turnover",palette:"ocean",payload:{"palette":"ocean","filename":"gestao-rh","dashboard":{"title":"Gestao de RH","subtitle":"Headcount e Turnover · 2025","kpis":[{"label":"Headcount Final","formula":"=RH!E16","format":"number","sublabel":"Colaboradores","accent":"00BFA5"},{"label":"Admissoes","formula":"=RH!B16","format":"number","sublabel":"No periodo","accent":"2EC863"},{"label":"Demissoes","formula":"=RH!C16","format":"number","sublabel":"No periodo","accent":"E84855"},{"label":"Turnover","formula":"=RH!F16","format":"percent","sublabel":"Media","accent":"F5A623"}]},"sheets":[{"name":"RH","headers":["Mes","Admissoes","Demissoes","Headcount Inicial","Headcount Final","Turnover %"],"col_types":["text","number","number","number","number","percent"],"formula_cols":[4,5],"formula_expressions":["=D{ROW}+B{ROW}-C{ROW}","=C{ROW}/D{ROW}"],"totals_row":true,"rows":[["Janeiro",3,1,120,0,0],["Fevereiro",2,2,122,0,0],["Marco",5,1,122,0,0],["Abril",1,3,126,0,0],["Maio",4,2,124,0,0],["Junho",2,1,126,0,0],["Julho",6,3,127,0,0],["Agosto",3,2,130,0,0],["Setembro",4,1,131,0,0],["Outubro",2,4,134,0,0],["Novembro",5,2,132,0,0],["Dezembro",3,3,135,0,0]]}]}},
+  {icon:"🎯",name:"Metas vs Resultado",desc:"KPIs, atingimento e variação",palette:"corporate",payload:{"palette":"corporate","filename":"metas-vs-resultado","dashboard":{"title":"Metas vs Resultado","subtitle":"KPIs e OKRs · 2025","kpis":[{"label":"Media Atingimento","formula":"=Metas!D16","format":"percent","sublabel":"Geral","accent":"2E75B6"},{"label":"Metas Batidas","formula":"=Metas!E16","format":"number","sublabel":"De 12","accent":"2EC863"},{"label":"Melhor Resultado","formula":"=Metas!C16","format":"currency","sublabel":"Pico","accent":"ED7D31"}]},"sheets":[{"name":"Metas","headers":["Mes","Meta","Resultado","Atingimento %","Bateu?","Var %"],"col_types":["text","currency","currency","percent","number","percent"],"formula_cols":[3,4,5],"formula_expressions":["=C{ROW}/B{ROW}","=SE(D{ROW}>=1,1,0)","=(C{ROW}-B{ROW})/B{ROW}"],"totals_row":true,"rows":[["Janeiro",100000,95000,0,0,0],["Fevereiro",105000,112000,0,0,0],["Marco",98000,94000,0,0,0],["Abril",110000,115000,0,0,0],["Maio",115000,118000,0,0,0],["Junho",120000,108000,0,0,0],["Julho",118000,125000,0,0,0],["Agosto",125000,130000,0,0,0],["Setembro",130000,135000,0,0,0],["Outubro",128000,122000,0,0,0],["Novembro",135000,142000,0,0,0],["Dezembro",145000,158000,0,0,0]]}]}},
+];
+function abrirTemplates(){
+  const grid=document.getElementById("tpl-grid");
+  grid.innerHTML=TEMPLATES.map((t,i)=>`<div class="tpl-card" onclick="usarTemplate(${i})"><span class="tpl-icon">${t.icon}</span><div class="tpl-name">${t.name}</div><div class="tpl-desc">${t.desc}</div><span class="tpl-badge pro">PRO</span></div>`).join("");
+  document.getElementById("tpl-overlay").classList.add("open");
+}
+function fecharTemplates(e){if(!e||e.target===document.getElementById("tpl-overlay"))document.getElementById("tpl-overlay").classList.remove("open");}
+async function usarTemplate(i){
+  fecharTemplates();
+  const tpl=TEMPLATES[i];
+  if(!podeCriarPlanilha()){showToast("⚠️ Limite mensal atingido! ("+getPlanilhasGeradas()+"/"+LIMITE_PLAN_PRO+")");return;}
+  if(modo!=="gerador")setMode("gerador");
+  const msg="Template **"+tpl.name+"** selecionado! Escolha o tema e clique em **Baixar** abaixo. 🚀";
+  historico.gerador.push({role:"assistant",content:msg});
+  exibeMsg("assistant",msg);
+  setTimeout(()=>exibePlanilhaCard(tpl.payload),50);
+}
+function exibePlanilhaCard(parsedPayload){
+  const ci=document.getElementById("chat-inner");
+  const div=document.createElement("div");div.className="msg";
+  const av=document.createElement("div");av.className="msg-avatar";av.textContent="📊";div.appendChild(av);
+  const bubble=document.createElement("div");bubble.className="msg-bubble";
+  const prev=buildPreview(parsedPayload);if(prev)bubble.appendChild(prev);
+  const palRow=document.createElement("div");palRow.className="palette-row";
+  const palLabel=document.createElement("span");palLabel.className="pal-label";palLabel.textContent="Tema:";
+  palRow.appendChild(palLabel);
+  Object.entries(PALETTES).forEach(([key,pal])=>{
+    const btn=document.createElement("button");btn.className="pal-btn"+(key===selectedPalette?" active":"");
+    btn.dataset.pal=key;btn.innerHTML=`<span class="pal-dot" style="background:${pal.dot}"></span>${pal.label}`;
+    btn.onclick=()=>{selectedPalette=key;div.querySelectorAll(".pal-btn").forEach(b=>b.classList.toggle("active",b.dataset.pal===key));};
+    palRow.appendChild(btn);
+  });
+  bubble.appendChild(palRow);
+  const card=document.createElement("div");card.className="dl-card";
+  const cardTop=document.createElement("div");cardTop.className="dl-card-top";
+  const sc=parsedPayload.sheets.length;const kc=parsedPayload.dashboard?.kpis?.length||0;
+  const ct=parsedPayload.dashboard?.title||parsedPayload.filename||"Planilha";
+  cardTop.innerHTML=`<div class="dl-card-icon">📊</div><div class="dl-card-info"><div class="dl-card-title">${ct}</div><div class="dl-card-sub">${sc} aba(s) · ${kc} KPIs · Dashboard · Fórmulas automáticas · Formatação condicional</div></div>`;
+  card.appendChild(cardTop);
+  const ca=document.createElement("div");ca.className="dl-card-actions";
+  const btn=document.createElement("button");btn.className="btn-dl";
+  btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar Planilha .xlsx';
+  btn.onclick=async()=>{
+    btn.disabled=true;btn.textContent="⏳ Gerando...";
+    try{
+      parsedPayload.palette=selectedPalette;
+      await gerarExcel(parsedPayload,selectedPalette);
+      const count=addPlanilhaGerada();
+      salvarPlanilhaLog(ct,selectedPalette,sc);
+      showToast("✅ "+ct+".xlsx baixado! ("+count+"/"+LIMITE_PLAN_PRO+" este mês)");
+      btn.innerHTML="✅ Download iniciado!";btn.style.background="#27AE60";
+      setTimeout(()=>{btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar novamente';btn.style.background="";btn.disabled=false;},3000);
+    }catch(err){
+      console.error(err);btn.innerHTML="❌ Erro — tente novamente";btn.style.background="#E84855";btn.disabled=false;
+      setTimeout(()=>{btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar Planilha .xlsx';btn.style.background="";},3000);
+    }
+  };
+  ca.appendChild(btn);card.appendChild(ca);bubble.appendChild(card);div.appendChild(bubble);ci.appendChild(div);
+  document.getElementById("chat-area").scrollTop=999999;
+}
 
 // ════════════════════════════════════════════════════════
 //  DARK MODE
@@ -409,18 +655,32 @@ function saveFormula(formula,desc){
   localStorage.setItem("pl_hist",JSON.stringify(h));
 }
 function abrirHistorico(){
-  const h=getHistorico();
-  const body=document.getElementById("hist-body");
-  if(h.length===0){body.innerHTML=`<div class="hist-empty">📭 Nenhuma fórmula salva ainda.<br/>As fórmulas geradas aparecem aqui automaticamente.</div>`;
-  }else{
-    body.innerHTML=h.map((item,i)=>`<div class="hist-item" onclick="usarFormula(${i})"><div class="hist-item-formula">${esc(item.formula)}</div><div class="hist-item-desc">${esc(item.desc||"Fórmula salva")}</div><div class="hist-item-date">${item.date}</div></div>`).join("");
-  }
+  renderHistBody();
   document.getElementById("hist-panel").classList.add("open");
   document.getElementById("hist-overlay").style.display="block";
 }
 function fecharHistorico(){
   document.getElementById("hist-panel").classList.remove("open");
   document.getElementById("hist-overlay").style.display="none";
+}
+function switchHistTab(tab){
+  histTab=tab;
+  document.getElementById("htab-form").classList.toggle("active",tab==="form");
+  document.getElementById("htab-plan").classList.toggle("active",tab==="plan");
+  renderHistBody();
+}
+function renderHistBody(){
+  const q=(document.getElementById("hist-search")?.value||"").toLowerCase();
+  const body=document.getElementById("hist-body");
+  if(histTab==="form"){
+    const h=getHistorico().filter(it=>!q||it.formula.toLowerCase().includes(q)||((it.desc||"").toLowerCase().includes(q)));
+    if(h.length===0){body.innerHTML=`<div class="hist-empty">📭 Nenhuma fórmula salva ainda.<br/>As fórmulas geradas aparecem aqui automaticamente.</div>`;}
+    else{body.innerHTML=h.map((item,i)=>`<div class="hist-item" onclick="usarFormula(${i})"><div class="hist-item-formula">${esc(item.formula)}</div><div class="hist-item-desc">${esc(item.desc||"Fórmula salva")}</div><div class="hist-item-date">${item.date}</div></div>`).join("");}
+  }else{
+    const logs=getPlanilhasLog().filter(l=>!q||l.nome.toLowerCase().includes(q)||l.palette.toLowerCase().includes(q));
+    if(logs.length===0){body.innerHTML=`<div class="hist-empty">📊 Nenhuma planilha gerada ainda.<br/>Baixe uma planilha para ver o histórico aqui.</div>`;}
+    else{body.innerHTML=logs.map(l=>`<div class="hist-gen-item"><div class="hist-gen-name">📊 ${esc(l.nome)}</div><div class="hist-gen-meta">Tema: ${l.palette} · ${l.abas} aba(s) · ${l.data} ${l.hora}</div></div>`).join("");}
+  }
 }
 function usarFormula(i){
   const h=getHistorico();
@@ -452,11 +712,16 @@ function iniciar(){
     document.getElementById("tab-pro").style.display="inline";
     document.getElementById("tab-gerador").disabled=true;
   }
+  if(plano==="pro"){
+    document.getElementById("btn-tpl").style.display="flex";
+    atualizarContador();
+  }
   const msg=plano==="pro"
-    ?"Olá! 👋 Sou o **Planilheiro** — mande qualquer dúvida sobre **fórmulas**, **erros** ou **DAX**.\n\n✦ **Plano Pro ativo** — use ⚡ **Gerar Planilha** para receber arquivos Excel profissionais com dashboard e gráficos!\n\n📋 Use o botão **Minhas Fórmulas** no topo para acessar o histórico das suas fórmulas."
-    :"Olá! 👋 Sou o **Planilheiro** — mande qualquer dúvida sobre **fórmulas**, **erros** ou **DAX**.\n\n⚡ **Plano Básico** — "+Math.max(0,LIMITE_BASICO-getUsos())+" perguntas restantes hoje.";
+    ?"Olá! 👋 Sou o **Planilheiro** — mande qualquer dúvida sobre **fórmulas**, **erros** ou **DAX**.\n\n✦ **Plano Pro ativo** — use ⚡ **Gerar Planilha** para criar arquivos Excel profissionais, ou clique no botão ⚡ no topo para acessar os **6 templates prontos**!\n\n📋 Suas fórmulas e planilhas ficam salvas — clique no botão 📋 para acessar o histórico."
+    :"Olá! 👋 Sou o **Planilheiro** — mande qualquer dúvida sobre **fórmulas**, **erros** ou **DAX**.\n\n⚡ **Plano Básico** — "+Math.max(0,LIMITE_BASICO-getUsos())+" perguntas restantes hoje.\n\n💡 Faça upgrade para o **Plano Pro** e acesse geração de planilhas completas, templates prontos e muito mais!";
   exibeMsg("assistant",msg);
   renderChips();checkBanners();
+  setTimeout(iniciarOnboard, 600);
 }
 function sair(){location.reload();}
 
@@ -656,6 +921,74 @@ async function gerarExcel(payload,palette){
     const fmulCols=new Set(sheetDef.formula_cols||[]);
     const doTotals=sheetDef.totals_row!==false;
     const nCols=headers.length;
+    const DATA_START=4; // linhas 1-2=banner, 3=header, 4+=dados
+
+    // ── DETECTA EXPRESSÕES DE FÓRMULA POR COLUNA ──────
+    // Prioridade: 1) formula_expressions do JSON, 2) padrão extraído das rows, 3) inferência semântica
+    const formulaColsList = sheetDef.formula_cols || [];
+    const formulaExpressions = sheetDef.formula_expressions || []; // novo campo: ["=B{ROW}-C{ROW}", ...]
+
+    const formulaPatterns = {};
+    for(let fi=0; fi<formulaColsList.length; fi++){
+      const ci = formulaColsList[fi];
+
+      // 1) Usa formula_expressions se disponível
+      if(formulaExpressions[fi]){
+        const expr = formulaExpressions[fi].replace(/^=/,"");
+        formulaPatterns[ci] = (excelRow) => expr.replace(/\{ROW\}/g, String(excelRow));
+        continue;
+      }
+
+      // 2) Extrai padrão das rows (rows com "=..." na posição ci)
+      let pattern = null;
+      for(let ri=0; ri<rows.length; ri++){
+        const val = rows[ri][ci];
+        if(typeof val==="string" && val.startsWith("=")){
+          const excelRow = DATA_START + ri;
+          const normalized = val.replace(/([A-Z]+)(\d+)/g,(match,col,num)=>{
+            return parseInt(num)===excelRow ? col+"{ROW}" : match;
+          });
+          pattern = normalized.replace(/^=/,"");
+          break;
+        }
+      }
+      if(pattern){
+        formulaPatterns[ci] = (excelRow) => pattern.replace(/\{ROW\}/g, String(excelRow));
+        continue;
+      }
+
+      // 3) Inferência semântica pelo nome do header
+      const hdr = (headers[ci]||"").toLowerCase();
+      const inputCurrencyCols = [];
+      for(let pci=0; pci<nCols; pci++){
+        if(!fmulCols.has(pci) && pci>0 && (colTypes[pci]==="currency"||colTypes[pci]==="number")){
+          inputCurrencyCols.push(pci);
+        }
+      }
+
+      if(inputCurrencyCols.length>=2){
+        const first = colLetter(inputCurrencyCols[0]+1);
+        const second = colLetter(inputCurrencyCols[1]+1);
+        const rest = inputCurrencyCols.slice(1).map(c=>colLetter(c+1));
+
+        if(hdr.includes("lucro")||hdr.includes("resultado")||hdr.includes("saldo")||hdr.includes("liquido")){
+          formulaPatterns[ci] = (r) => `${first}${r}-${rest.map(c=>c+r).join("-")}`;
+        } else if(hdr.includes("total")||hdr.includes("soma")||hdr.includes("despesa total")){
+          formulaPatterns[ci] = (r) => `SUM(${first}${r}:${colLetter(inputCurrencyCols[inputCurrencyCols.length-1]+1)}${r})`;
+        } else if(hdr.includes("margin")||hdr.includes("margem")||hdr.includes("%")||colTypes[ci]==="percent"){
+          // Margem = (Receita - Despesa) / Receita  ou  Lucro / Receita
+          const lucroCi = formulaColsList.find(c=>(headers[c]||"").toLowerCase().includes("lucro"));
+          if(lucroCi!==undefined){
+            formulaPatterns[ci] = (r) => `${colLetter(lucroCi+1)}${r}/${first}${r}`;
+          } else {
+            formulaPatterns[ci] = (r) => `(${first}${r}-${second}${r})/${first}${r}`;
+          }
+        } else {
+          formulaPatterns[ci] = (r) => `${first}${r}-${rest.map(c=>c+r).join("-")}`;
+        }
+      } else if(inputCurrencyCols.length===1){
+        formulaPatterns[ci] = (r) => `${colLetter(inputCurrencyCols[0]+1)}${r}`;
+      }
 
     const ws=wb.addWorksheet(wsName);
     ws.views=[{showGridLines:false}];ws.tabColor=hx(p.acc1);
@@ -676,8 +1009,7 @@ async function gerarExcel(payload,palette){
       ws.getColumn(ci+1).width=Math.max((headers[ci]||"").length+6,14);
     }
 
-    // Dados (row 4+)
-    const DATA_START=4;
+    // Dados (row 4+) — fórmulas geradas pelo JS, não pelo Claude
     for(let ri=0;ri<rows.length;ri++){
       const excelRow=DATA_START+ri;
       const bg=ri%2===0?p.altRow:p.bodyBg;
@@ -686,18 +1018,32 @@ async function gerarExcel(payload,palette){
 
       for(let ci=0;ci<nCols;ci++){
         const c=ws.getCell(excelRow,ci+1);
-        let val=rowData[ci]!==undefined?rowData[ci]:"";
+        const isFormula=fmulCols.has(ci);
 
-        // CORREÇÃO PRINCIPAL: fórmulas como objeto {formula, result}
-        // O "result:0" força o Excel a recalcular ao abrir
-        if(typeof val==="string"&&val.startsWith("=")){
-          c.value={formula:val.substring(1),result:0};
+        if(isFormula){
+          // SEMPRE usa a fórmula gerada pelo JS — nunca o valor do Claude
+          const gen=formulaPatterns[ci];
+          if(gen){
+            c.value={formula:gen(excelRow),result:0};
+          }else{
+            // último recurso: referencia à célula anterior
+            c.value={formula:`${colLetter(ci)}${excelRow}`,result:0};
+          }
+          // Destaque visual: fundo levemente diferente para colunas calculadas
+          c.fill=fg(ri%2===0?"D4EDDA":"E8F5EE"); // verde muito suave = calculado
+          c.font=mkFont("155724",10,true);
         }else{
+          // Coluna de entrada: usa valor do Claude (número ou texto)
+          let val=rowData[ci]!==undefined?rowData[ci]:"";
+          // Se o Claude mandou fórmula numa coluna de entrada, usa o valor absoluto
+          if(typeof val==="string"&&val.startsWith("=")){
+            val=0; // coluna de entrada não deve ter fórmula
+          }
           c.value=val;
+          c.fill=fg(bg);
+          c.font=mkFont("1A1A1A",10);
         }
 
-        c.fill=fg(bg);
-        c.font=mkFont(fmulCols.has(ci)?p.hdrBg:"1A1A1A",10,fmulCols.has(ci));
         c.alignment=ci===0?mkAlign("left"):mkAlign("right");
         c.border=mkBorderBottom(p.border);
         const fmt=NUM_FMT[colTypes[ci]||"text"];
@@ -705,7 +1051,7 @@ async function gerarExcel(payload,palette){
       }
     }
 
-    // Linha TOTAL
+    // Linha TOTAL — sempre com SUM/AVERAGE reais
     const totalRow=DATA_START+rows.length;
     if(doTotals&&rows.length>0){
       ws.getRow(totalRow).height=28;
@@ -714,8 +1060,7 @@ async function gerarExcel(payload,palette){
         const cl=colLetter(ci+1);
         const typ=colTypes[ci]||"text";
         if(ci===0){
-          c.value="TOTAL";
-          c.alignment=mkAlign("left","middle");
+          c.value="TOTAL";c.alignment=mkAlign("left","middle");
         }else if(typ==="currency"||typ==="number"){
           c.value={formula:`SUM(${cl}${DATA_START}:${cl}${totalRow-1})`,result:0};
           c.numFmt=NUM_FMT[typ];
@@ -728,29 +1073,34 @@ async function gerarExcel(payload,palette){
       }
     }
 
-    // FORMATAÇÃO CONDICIONAL — verde se positivo, vermelho se negativo
+    // FORMATAÇÃO CONDICIONAL
     for(let ci=1;ci<nCols;ci++){
       const typ=colTypes[ci]||"text";
       if(typ==="currency"||typ==="number"){
         const cl=colLetter(ci+1);
         const range=`${cl}${DATA_START}:${cl}${DATA_START+rows.length-1}`;
-        // Positivo → verde suave
         ws.addConditionalFormatting({ref:range,rules:[{
           type:"cellIs",operator:"greaterThan",formulae:[0],
-          style:{fill:{type:"pattern",pattern:"solid",bgColor:{argb:"FFD4EDDA"}},
-                 font:{color:{argb:"FF155724"}}}
+          style:{fill:{type:"pattern",pattern:"solid",bgColor:{argb:"FFD4EDDA"}},font:{color:{argb:"FF155724"}}}
         }]});
-        // Negativo → vermelho suave
         ws.addConditionalFormatting({ref:range,rules:[{
           type:"cellIs",operator:"lessThan",formulae:[0],
-          style:{fill:{type:"pattern",pattern:"solid",bgColor:{argb:"FFF8D7DA"}},
-                 font:{color:{argb:"FF721C24"}}}
+          style:{fill:{type:"pattern",pattern:"solid",bgColor:{argb:"FFF8D7DA"}},font:{color:{argb:"FF721C24"}}}
         }]});
       }
     }
 
-    // Largura mínima col 1
     ws.getColumn(1).width=Math.max(ws.getColumn(1).width||12,13);
+
+    // PROTEÇÃO LEVE: destaque visual nas colunas de entrada (azul claro no header)
+    // para o usuário saber onde editar
+    for(let ci=0;ci<nCols;ci++){
+      if(!fmulCols.has(ci)&&ci>0){
+        const hdrCell=ws.getCell(3,ci+1);
+        hdrCell.fill=fg("2E6DA4"); // azul = editar aqui
+        hdrCell.font=mkFont("FFFFFF",10,true);
+      }
+    }
   }
 
   // ── ABA DASHBOARD ───────────────────────────────────
@@ -936,10 +1286,14 @@ function exibeMsg(role,content){
 
     if(parsedPayload){
       btn.onclick=async()=>{
+        if(!podeCriarPlanilha()){showToast("⚠️ Limite mensal atingido! ("+getPlanilhasGeradas()+"/"+LIMITE_PLAN_PRO+")");return;}
         btn.disabled=true;btn.textContent="⏳ Gerando arquivo...";
         try{
           parsedPayload.palette=selectedPalette;
           await gerarExcel(parsedPayload,selectedPalette);
+          const count=addPlanilhaGerada();
+          salvarPlanilhaLog(cardTitle,selectedPalette,sheetCount);
+          showToast("✅ "+cardTitle+".xlsx baixado! ("+count+"/"+LIMITE_PLAN_PRO+" este mês)");
           btn.innerHTML="✅ Download iniciado!";btn.style.background="#27AE60";
           setTimeout(()=>{btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar novamente`;btn.style.background="";btn.disabled=false;},3000);
         }catch(err){
