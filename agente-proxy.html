@@ -501,59 +501,70 @@ const SENHAS_BASICO = ["BASICO2025","PLAN123","EXCEL001"];
 const SENHAS_PRO    = ["PRO2025","PLANPRO1","POWERBI01"];
 const LIMITE_BASICO = 50;
 
-const SYSTEM_CHAT = `Você é o Planilheiro, especialista em Excel e Power BI. Sua missão é ajudar qualquer pessoa, mesmo sem conhecimento técnico.
+const SYSTEM_CHAT = `Você é o Planilheiro, um agente especialista em Excel e Google Planilhas, focado em ajudar usuários a resolver problemas com fórmulas. Seu nível de explicação é claro, didático e prático, adaptado tanto para iniciantes quanto para intermediários.
 
-Quando alguém pedir uma fórmula ou solução:
+NO PLANO BÁSICO você:
+1. Conserta fórmulas com erros — identifica o problema, explica o que estava errado e entrega a fórmula corrigida
+2. Explica fórmulas passo a passo com exemplos simples e ensina como adaptar para outros cenários
+3. Trabalha com: SOMASE, SE, PROCV, PROCX, ÍNDICE, CORRESP, CONT.SE, CONT.SES, FILTRO, ÚNICO, datas, textos, porcentagens, referências relativas e absolutas
 
-1. **Explique brevemente** o que a fórmula/recurso faz em linguagem simples (1-2 linhas)
-2. **Se existir uma forma mais fácil** de atingir o mesmo resultado, mencione ela antes
-3. **Sempre pergunte** qual prefere:
-   - 🔢 A **fórmula pronta** para copiar e colar
-   - 📋 O **passo a passo** de como fazer
+COMPORTAMENTO OBRIGATÓRIO:
+- Quando o usuário pedir uma fórmula ou ajuda, SEMPRE pergunte primeiro:
+  "Você prefere:
+  📋 Explicação completa passo a passo
+  ✅ Fórmula pronta para copiar e colar"
+- Só entregue a resposta DEPOIS que o usuário escolher
+- Se escolher passo a passo: numere cada etapa, use linguagem simples, dê exemplos
+- Se escolher fórmula pronta: entregue em bloco de código com breve explicação de cada parte
+- Evite termos técnicos sem explicação para iniciantes
+- NÃO entregue arquivos no plano básico — apenas orientação, explicação e fórmulas
 
-Só entregue a fórmula ou o passo a passo DEPOIS que a pessoa escolher.
+Responda sempre em português do Brasil.`;
 
-Ao entregar fórmulas: use blocos de código e explique cada parte de forma simples.
-Ao entregar passo a passo: numere cada etapa com clareza, como se estivesse ensinando alguém do zero.
-
-Você também resolve: erros (#VALOR!, #REF!, #N/D, #DIV/0!), medidas DAX, tabelas dinâmicas, formatação condicional e macros VBA básicas.
-
-Responda sempre em português do Brasil. Use linguagem simples, sem jargão técnico. Seja amigável e paciente.`;
-
-const SYSTEM_GERADOR = `Você é o Planilheiro, especialista em criar planilhas avançadas prontas para uso no Excel.
+const SYSTEM_GERADOR = `Você é o Planilheiro, um agente especialista em Excel e Google Planilhas. No PLANO PREMIUM você cria modelos completos de planilhas prontas para uso.
 
 FLUXO OBRIGATÓRIO:
 
-Passo 1 - Entender o objetivo:
-Faça as perguntas abaixo de forma natural e amigável (uma de cada vez):
-1. Qual é o objetivo principal da planilha?
-2. Quais informações/dados serão inseridos?
-3. É para uso pessoal ou empresarial?
-4. Tem alguma preferência de organização ou visual?
+Passo 1 - Entender o que o usuário precisa:
+Faça as perguntas abaixo de forma natural (uma de cada vez):
+1. Qual tipo de planilha você precisa? (financeiro, vendas, estoque, fluxo de caixa, outro)
+2. É para uso pessoal ou empresarial?
+3. Quais informações principais você quer controlar?
+4. Tem alguma preferência de organização?
 
-Passo 2 - Confirmar e montar:
-Após entender tudo, explique em texto simples a estrutura que vai criar.
+Passo 2 - Confirmar a estrutura:
+Explique em texto simples quais abas vai criar e o que cada uma faz.
+Diga onde o usuário vai inserir os dados.
 
 Passo 3 - Gerar o arquivo:
-Ao final, diga "Aqui está sua planilha pronta para baixar!" e gere OBRIGATORIAMENTE um bloco de código JSON com exatamente esta estrutura:
+Diga "Aqui está sua planilha pronta! Clique no botão abaixo para baixar." e gere OBRIGATORIAMENTE o bloco abaixo:
 
 \`\`\`planilha
-{"filename":"nome-arquivo","sheets":[{"name":"Aba1","headers":["Col1","Col2","Col3"],"rows":[["dado1","dado2","=FORMULA"],["dado3","dado4","=FORMULA"]]}]}
+COLE_O_JSON_AQUI
 \`\`\`
 
-REGRAS IMPORTANTES:
-- O bloco DEVE começar com \`\`\`planilha (três crases + a palavra planilha)
-- filename: nome sem espaços, use hifens
-- sheets: todas as abas necessárias
-- headers: cabeçalhos em português
-- rows: mínimo 5 linhas com dados de exemplo realistas
-- Fórmulas Excel reais nas colunas calculadas (=SOMA, =SE, =B2*C2, etc)
-- Primeira aba sempre "Instrucoes" com orientações de uso
-- O JSON deve ser válido e em UMA ÚNICA LINHA dentro do bloco
+O JSON deve seguir EXATAMENTE esta estrutura:
+{"filename":"nome-arquivo","sheets":[{"name":"NomeDaAba","headers":["Col1","Col2","Col3"],"rows":[["dado1","dado2","=FORMULA(A2)"],["dado3","dado4","=FORMULA(A3)"]]}]}
 
-Responda sempre em português do Brasil. Seja amigável e personalizado.`;
+REGRAS DO JSON:
+- filename: nome sem espaços, use hifens (ex: controle-financeiro)
+- sheets: TODAS as abas da planilha
+- Primeira aba SEMPRE "Instrucoes" explicando como usar
+- headers: cabeçalhos em português, claros e objetivos  
+- rows: mínimo 8 linhas com dados de exemplo REALISTAS e úteis
+- Colunas calculadas com fórmulas Excel reais: =SOMA(), =SE(), =SUMIFS(), =B2*C2, etc
+- O JSON deve ser válido — sem quebras de linha dentro de strings, use aspas duplas
+- Não inclua comentários no JSON
 
-const CHIPS_CHAT    = ["Como fazer PROCV entre duas abas?","Erro #N/D no PROCV, como corrigir?","Fórmula para somar por mês","Como travar célula com F4?","DAX de % crescimento mês a mês","Coluna calculada no Power BI"];
+AO ENTREGAR A PLANILHA:
+- Descreva para que serve cada aba
+- Explique onde o usuário insere os dados
+- Deixe claro que o modelo já está totalmente funcional com fórmulas prontas
+
+Modelos disponíveis: controle financeiro pessoal/empresarial, despesas e receitas, fluxo de caixa, vendas, estoque, orçamentos, dashboards
+
+Responda sempre em português do Brasil. Seja objetivo, didático e profissional.`;
+
 const CHIPS_GERADOR = ["Controle financeiro pessoal","Controle de estoque com alertas","Dashboard de vendas","Fluxo de caixa empresarial","Dashboard RH com turnover","Metas vs resultado Power BI"];
 
 let plano = null, modo = "chat", loading = false;
@@ -620,47 +631,57 @@ function exibeMsg(role, content) {
   div.className = "msg" + (isUser ? " user" : "");
   if (!isUser) {
     const av = document.createElement("div");
-    av.className = "msg-avatar"; av.textContent = "📊";
+    av.className = "msg-avatar";
+    av.textContent = "📊";
     div.appendChild(av);
   }
   const bubble = document.createElement("div");
   bubble.className = "msg-bubble";
 
-  // Detecta bloco planilha e gera botão de download
-  const TAG_START = "```planilha";
-  const TAG_END = "```";
-  const startIdx = content.indexOf(TAG_START);
-  let jsonData = null;
-  let cleanContent = content;
+  if (role === "assistant") {
+    // Procura pelo bloco ```planilha
+    const OPEN = "```planilha";
+    const CLOSE = "```";
+    const si = content.indexOf(OPEN);
+    let jsonData = null;
+    let displayContent = content;
 
-  if (startIdx !== -1 && role === "assistant") {
-    const afterStart = content.indexOf("\n", startIdx) + 1;
-    const endIdx = content.indexOf(TAG_END, afterStart);
-    if (endIdx !== -1) {
-      const jsonStr = content.substring(afterStart, endIdx).trim();
-      cleanContent = (content.substring(0, startIdx) + content.substring(endIdx + 3)).trim();
-      try {
-        jsonData = JSON.parse(jsonStr);
-      } catch(e) {
-        // Tenta limpar o JSON antes de parsear
+    if (si !== -1) {
+      const afterNewline = content.indexOf("\n", si);
+      const jsonStart = afterNewline !== -1 ? afterNewline + 1 : si + OPEN.length;
+      const closeIdx = content.indexOf(CLOSE, jsonStart);
+      if (closeIdx !== -1) {
+        const jsonStr = content.substring(jsonStart, closeIdx).trim();
+        displayContent = (content.substring(0, si) + content.substring(closeIdx + 3)).trim();
         try {
-          const cleaned = jsonStr.replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
-          jsonData = JSON.parse(cleaned);
-        } catch(e2) {
-          console.error("Erro JSON:", e2, jsonStr.slice(0, 200));
+          jsonData = JSON.parse(jsonStr);
+        } catch(e) {
+          console.warn("JSON inválido, tentando limpar...", e.message);
+          try {
+            // Remove caracteres de controle e tenta de novo
+            const safe = jsonStr.replace(/[\u0000-\u001F]/g, " ").replace(/\n/g, " ").replace(/\r/g, "");
+            jsonData = JSON.parse(safe);
+          } catch(e2) {
+            console.error("Falha no parse JSON:", jsonStr.substring(0, 300));
+          }
         }
       }
     }
-  }
 
-  bubble.innerHTML = formatMsg(cleanContent);
+    bubble.innerHTML = formatMsg(displayContent);
 
-  if (jsonData && role === "assistant") {
-    const btn = document.createElement("button");
-    btn.className = "btn-download";
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar planilha Excel (.xlsx)';
-    btn.onclick = () => gerarExcel(jsonData);
-    bubble.appendChild(btn);
+    if (jsonData) {
+      const sep = document.createElement("div");
+      sep.style.cssText = "margin-top:14px;padding-top:14px;border-top:1px solid var(--border);";
+      const btn = document.createElement("button");
+      btn.className = "btn-download";
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar planilha Excel (.xlsx)';
+      btn.onclick = () => gerarExcel(jsonData);
+      sep.appendChild(btn);
+      bubble.appendChild(sep);
+    }
+  } else {
+    bubble.innerHTML = formatMsg(content);
   }
 
   div.appendChild(bubble);
