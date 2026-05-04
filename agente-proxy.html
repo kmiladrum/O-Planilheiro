@@ -625,35 +625,53 @@ function setMode(m) {
 }
 
 function extrairPlanilhaJSON(text) {
-  // Tenta varias formas de encontrar o bloco planilha
   const OPEN = "```planilha";
   const si = text.indexOf(OPEN);
   if (si === -1) return null;
 
-  // Pega tudo depois de ```planilha
   const afterOpen = text.substring(si + OPEN.length);
-
-  // Encontra o fechamento ```
   const closeIdx = afterOpen.indexOf("```");
   const raw = closeIdx !== -1 ? afterOpen.substring(0, closeIdx) : afterOpen;
 
-  // Limpa e tenta parsear
-  const jsonStr = raw.trim();
-  const attempts = [
-    jsonStr,
-    jsonStr.replace(/\n/g, " ").replace(/\r/g, ""),
-    jsonStr.replace(/[\u0000-\u001F]/g, " "),
-    jsonStr.replace(/\n/g, "").replace(/\r/g, "").replace(/[\u0000-\u001F]/g, ""),
-  ];
+  // Limpeza agressiva do JSON
+  let jsonStr = raw.trim();
 
-  for (const attempt of attempts) {
+  // Remove quebras de linha DENTRO de strings (problema comum do Claude)
+  // Estrategia: juntar tudo numa linha, normalizar espacos
+  jsonStr = jsonStr
+    .replace(/\r\n/g, " ")
+    .replace(/\n/g, " ")
+    .replace(/\r/g, " ")
+    .replace(/\t/g, " ")
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g, " ")
+    .replace(/,\s*}/g, "}")
+    .replace(/,\s*]/g, "]")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  // Tenta parsear direto
+  try {
+    const parsed = JSON.parse(jsonStr);
+    if (parsed && parsed.sheets) return parsed;
+  } catch(e1) {
+    // Tenta encontrar o JSON com regex — pega tudo entre { e o ultimo }
     try {
-      const parsed = JSON.parse(attempt);
-      if (parsed.filename && parsed.sheets) return parsed;
-    } catch(e) { /* tenta o proximo */ }
+      const match = jsonStr.match(/\{.*\}/s);
+      if (match) {
+        const parsed = JSON.parse(match[0]);
+        if (parsed && parsed.sheets) return parsed;
+      }
+    } catch(e2) {
+      // Tenta consertar aspas simples usadas por engano
+      try {
+        const fixed = jsonStr.replace(/'/g, '"');
+        const parsed = JSON.parse(fixed);
+        if (parsed && parsed.sheets) return parsed;
+      } catch(e3) {
+        console.error("Falha total no parse. JSON recebido:", jsonStr.substring(0, 400));
+      }
+    }
   }
-
-  console.error("Nao foi possivel parsear JSON:", jsonStr.substring(0, 200));
   return null;
 }
 
@@ -682,7 +700,10 @@ function exibeMsg(role, content) {
   bubble.className = "msg-bubble";
 
   if (role === "assistant" && content.indexOf("```planilha") !== -1) {
+    console.log("=== BLOCO PLANILHA DETECTADO ===");
+    console.log("Conteudo completo:", content.substring(0, 500));
     const jsonData = extrairPlanilhaJSON(content);
+    console.log("JSON parseado:", jsonData);
     const displayContent = limparBlocoPlanilha(content);
     bubble.innerHTML = formatMsg(displayContent);
 
