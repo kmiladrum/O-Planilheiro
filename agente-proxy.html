@@ -618,13 +618,22 @@ async function gerarExcel(payload, palette){
 
       for(let ci=0;ci<nCols;ci++){
         const c=ws.getCell(excelRow,ci+1);
-        const val=rowData[ci]!==undefined?rowData[ci]:"";
-        c.value=val;
+        let val=rowData[ci]!==undefined?rowData[ci]:"";
+
+        // Fórmulas: string que começa com "=" deve ser objeto {formula:...} no ExcelJS
+        // ExcelJS NÃO aceita o "=" no início — só a expressão pura
+        if(typeof val==="string" && val.startsWith("=")){
+          c.value={ formula: val.substring(1) };
+        } else {
+          c.value=val;
+        }
+
         c.fill=fgColor(bg);
         c.font=bodyFont(10, fmulCols.has(ci), fmulCols.has(ci)?p.hdrBg:"1A1A1A");
         c.alignment=ci===0?leftAlign():rightAlign();
         c.border=bottomBorder(p.border);
-        const fmt=NUM_FMT[colTypes[ci]];
+        // Aplica formato numérico — inclusive em colunas de fórmula
+        const fmt=NUM_FMT[colTypes[ci]||"text"];
         if(fmt && fmt!=="@") c.numFmt=fmt;
       }
     }
