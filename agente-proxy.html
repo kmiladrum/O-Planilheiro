@@ -1,29 +1,44 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>O Planilheiro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<!-- ExcelJS: suporta estilos completos no browser (MIT License) -->
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
-<!-- FileSaver para download do arquivo -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-:root {
-  --bg:#ffffff; --surface:#f7f8f7; --surface2:#f0f4f0;
-  --border:#e8ede8; --border2:#d4ddd4;
-  --txt:#0d1a0d; --txt2:#4a6350; --txt3:#8fa693;
-  --green:#1a7a3c; --green2:#22a050; --green3:#2ec863;
-  --green-light:#e8f5ec; --green-light2:#d0edda;
-  --shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 16px rgba(0,0,0,0.04);
-  --shadow2:0 2px 8px rgba(26,122,60,0.12);
+/* ── DARK MODE TOKENS ─────────────────────────────── */
+:root{
+  --bg:#ffffff;--surface:#f7f8f7;--surface2:#eef2ee;
+  --border:#e8ede8;--border2:#d4ddd4;
+  --txt:#0d1a0d;--txt2:#4a6350;--txt3:#8fa693;
+  --green:#1a7a3c;--green2:#22a050;--green3:#2ec863;
+  --green-light:#e8f5ec;--green-light2:#d0edda;
+  --red:#dc2626;--red-bg:#fef2f2;--red-border:#fecaca;
+  --amber:#92400e;--amber-bg:#fffbeb;--amber-border:#fde68a;
+  --code-bg:#f4f7f4;--code-color:#1a7a3c;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+  --shadow2:0 2px 8px rgba(26,122,60,.12);
+}
+[data-theme="dark"]{
+  --bg:#0f1a10;--surface:#162318;--surface2:#1c2e1d;
+  --border:#243527;--border2:#2e4430;
+  --txt:#e8f5ec;--txt2:#8fbc9a;--txt3:#4a6b50;
+  --green:#2ec863;--green2:#3dd470;--green3:#5adb82;
+  --green-light:#1a2e1c;--green-light2:#1e3520;
+  --red:#f87171;--red-bg:#2d1212;--red-border:#5a2020;
+  --amber:#fbbf24;--amber-bg:#2a1d00;--amber-border:#5a3c00;
+  --code-bg:#162318;--code-color:#2ec863;
+  --shadow:0 1px 3px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.2);
+  --shadow2:0 2px 8px rgba(46,200,99,.15);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;font-size:15px;line-height:1.6}
+body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;font-size:15px;line-height:1.6;transition:background .2s,color .2s}
 
-/* LOGIN */
+/* ── LOGIN ──────────────────────────────────────── */
 #login-screen{position:fixed;inset:0;background:var(--surface);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}
 .login-card{width:100%;max-width:420px;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:48px 40px;box-shadow:var(--shadow);animation:fadeUp .4s ease both}
 .login-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px}
@@ -35,17 +50,19 @@ body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',sans-
 .field-label{font-size:12px;font-weight:600;color:var(--txt2);margin-bottom:8px;display:block;letter-spacing:.02em}
 .pass-wrap{position:relative;margin-bottom:12px}
 .pass-wrap input{width:100%;background:var(--surface);border:1.5px solid var(--border2);border-radius:10px;padding:13px 44px 13px 14px;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:14px;outline:none;transition:all .2s}
-.pass-wrap input:focus{border-color:var(--green2);background:var(--bg);box-shadow:0 0 0 3px rgba(34,160,80,.1)}
+.pass-wrap input:focus{border-color:var(--green2);background:var(--bg);box-shadow:0 0 0 3px rgba(46,200,99,.12)}
 .pass-wrap input::placeholder{color:var(--txt3);font-family:'Plus Jakarta Sans',sans-serif}
 .show-pass{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--txt3);font-size:16px;padding:0}
-.error-msg{font-size:12px;color:#dc2626;font-weight:500;margin-bottom:12px;display:none;background:#fef2f2;border:1px solid #fecaca;padding:8px 12px;border-radius:8px}
+.error-msg{font-size:12px;color:var(--red);font-weight:500;margin-bottom:12px;display:none;background:var(--red-bg);border:1px solid var(--red-border);padding:8px 12px;border-radius:8px}
 .btn-login{width:100%;padding:13px;background:var(--green);color:white;border:none;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:all .2s;margin-top:8px;box-shadow:var(--shadow2)}
 .btn-login:hover{background:var(--green2);transform:translateY(-1px)}
 .login-footer{margin-top:28px;padding-top:20px;border-top:1px solid var(--border);font-size:13px;color:var(--txt3);text-align:center}
 .login-footer a{color:var(--green);font-weight:600;text-decoration:none}
 
-/* APP */
+/* ── APP ─────────────────────────────────────────── */
 #app-screen{display:none;flex-direction:column;height:100vh}
+
+/* HEADER */
 .header{height:60px;padding:0 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg);flex-shrink:0}
 .brand{display:flex;align-items:center;gap:10px}
 .brand-icon{width:34px;height:34px;background:var(--green);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px}
@@ -57,6 +74,8 @@ body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',sans-
 .plan-badge{font-size:11px;font-weight:700;color:var(--green);background:var(--green-light);border:1px solid var(--green-light2);padding:4px 10px;border-radius:100px;letter-spacing:.02em}
 .btn-upgrade{font-size:12px;font-weight:700;color:white;background:var(--green);border:none;padding:6px 14px;border-radius:100px;cursor:pointer;text-decoration:none;transition:all .2s;display:none}
 .btn-upgrade:hover{background:var(--green2)}
+.btn-icon{width:32px;height:32px;border-radius:8px;border:1px solid var(--border2);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .15s;color:var(--txt3)}
+.btn-icon:hover{background:var(--surface2);color:var(--txt2)}
 .btn-sair{font-size:12px;font-weight:500;color:var(--txt3);background:var(--surface);border:1px solid var(--border2);padding:6px 14px;border-radius:100px;cursor:pointer;transition:all .2s}
 .btn-sair:hover{color:var(--txt2)}
 
@@ -68,47 +87,90 @@ body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',sans-
 .tab:disabled{opacity:.4;cursor:not-allowed}
 .tab-pro-badge{font-size:9px;font-weight:700;color:var(--green);background:var(--green-light2);padding:2px 6px;border-radius:4px;letter-spacing:.05em}
 
+/* BANNERS */
 .info-bar{padding:8px 24px;background:var(--green-light);border-bottom:1px solid var(--green-light2);font-size:12px;color:var(--green);font-weight:500;display:none}
 .banner{margin:10px 24px 0;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:500}
-.banner-warn{background:#fffbeb;border:1px solid #fde68a;color:#92400e;display:none}
-.banner-block{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;display:none;align-items:center;justify-content:space-between;gap:12px}
+.banner-warn{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber);display:none}
+.banner-block{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red);display:none;align-items:center;justify-content:space-between;gap:12px}
 
 /* CHAT */
 .chat-area{flex:1;overflow-y:auto;padding:28px 24px;background:var(--bg)}
-.chat-inner{max-width:700px;margin:0 auto}
-.msg{display:flex;margin-bottom:20px;animation:fadeUp .2s ease}
+.chat-inner{max-width:720px;margin:0 auto}
+.msg{display:flex;margin-bottom:22px;animation:fadeUp .2s ease}
 .msg.user{justify-content:flex-end}
 .msg-avatar{width:32px;height:32px;background:var(--green-light);border:1.5px solid var(--green-light2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;margin-right:10px;flex-shrink:0;margin-top:2px}
-.msg-bubble{max-width:75%;font-size:14px;line-height:1.75;color:var(--txt)}
+.msg-bubble{max-width:78%;font-size:14px;line-height:1.8;color:var(--txt)}
 .msg.user .msg-bubble{background:var(--green);color:white;border-radius:16px 16px 4px 16px;padding:12px 16px;box-shadow:var(--shadow2)}
-.msg-code{background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--green);margin:10px 0;overflow-x:auto;line-height:1.7;white-space:pre-wrap}
+
+/* CODE BLOCK */
+.msg-code-wrap{position:relative;margin:10px 0}
+.msg-code{background:var(--code-bg);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--code-color);overflow-x:auto;line-height:1.7;white-space:pre-wrap;padding-right:70px}
+.btn-copy{position:absolute;top:8px;right:8px;font-size:11px;font-weight:700;background:var(--green-light);color:var(--green);border:1px solid var(--green-light2);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s}
+.btn-copy:hover{background:var(--green);color:white}
+.btn-copy.copied{background:var(--green);color:white}
+
+/* TYPING */
 .typing{display:flex;align-items:center;gap:4px;padding:12px 0}
 .typing span{width:6px;height:6px;border-radius:50%;background:var(--green-light2);animation:bounce 1.4s infinite}
 .typing span:nth-child(2){animation-delay:.2s}
 .typing span:nth-child(3){animation-delay:.4s}
 
+/* FEEDBACK */
+.msg-feedback{display:flex;align-items:center;gap:6px;margin-top:8px}
+.btn-fb{background:none;border:1px solid var(--border2);border-radius:6px;padding:3px 8px;font-size:12px;cursor:pointer;color:var(--txt3);transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif}
+.btn-fb:hover{border-color:var(--green2);color:var(--green)}
+.btn-fb.active-up{background:var(--green-light);border-color:var(--green2);color:var(--green)}
+.btn-fb.active-down{background:var(--red-bg);border-color:var(--red-border);color:var(--red)}
+.fb-label{font-size:11px;color:var(--txt3)}
+
 /* DOWNLOAD CARD */
-.dl-card{margin-top:16px;background:linear-gradient(135deg,#eafaf0,#d5f0e0);border:1.5px solid var(--green-light2);border-radius:14px;overflow:hidden}
+.dl-card{margin-top:16px;background:var(--green-light);border:1.5px solid var(--green-light2);border-radius:14px;overflow:hidden}
 .dl-card-top{padding:14px 18px;display:flex;align-items:center;gap:12px}
 .dl-card-icon{font-size:26px;flex-shrink:0}
 .dl-card-info{flex:1;min-width:0}
 .dl-card-title{font-size:13px;font-weight:700;color:var(--green);margin-bottom:2px}
 .dl-card-sub{font-size:11px;color:var(--txt3)}
-.dl-card-actions{padding:0 18px 14px;display:flex;gap:8px;flex-wrap:wrap}
+.dl-card-actions{padding:0 18px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* PREVIEW TABLE */
+.preview-wrap{margin:0 18px 12px;border-radius:8px;overflow:hidden;border:1px solid var(--border2)}
+.preview-table{width:100%;border-collapse:collapse;font-size:11px}
+.preview-table th{background:var(--surface2);color:var(--txt2);font-weight:600;padding:6px 10px;text-align:left;border-bottom:1px solid var(--border2)}
+.preview-table td{padding:5px 10px;border-bottom:1px solid var(--border);color:var(--txt2)}
+.preview-table tr:last-child td{border-bottom:none}
+.preview-table tr:nth-child(even) td{background:var(--surface)}
+.preview-chart-wrap{margin:0 18px 12px;border-radius:8px;overflow:hidden;border:1px solid var(--border2);background:var(--surface);padding:10px}
+
+/* BUTTONS */
 .btn-dl{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;background:var(--green);color:white;border:none;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(26,122,60,.2)}
 .btn-dl:hover{background:var(--green2);transform:translateY(-1px)}
 .btn-dl:disabled{background:var(--border2);color:var(--txt3);cursor:not-allowed;transform:none;box-shadow:none}
-.btn-dl.secondary{background:white;color:var(--green);border:1.5px solid var(--green-light2)}
+.btn-dl.secondary{background:var(--bg);color:var(--green);border:1.5px solid var(--green-light2)}
 .btn-dl.secondary:hover{background:var(--green-light)}
 
 /* PALETTE PILLS */
-.palette-row{display:flex;gap:6px;margin:12px 0 2px;flex-wrap:wrap}
-.pal-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:100px;border:1.5px solid var(--border2);background:white;font-size:11px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:var(--txt2);transition:all .15s}
+.palette-row{display:flex;gap:6px;margin:12px 0 4px;flex-wrap:wrap;align-items:center}
+.pal-label{font-size:11px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;margin-right:2px}
+.pal-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:100px;border:1.5px solid var(--border2);background:var(--bg);font-size:11px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:var(--txt2);transition:all .15s}
 .pal-btn:hover,.pal-btn.active{border-color:var(--green2);background:var(--green-light);color:var(--green)}
 .pal-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
 
+/* HISTORICO FORMULAS */
+.hist-panel{position:fixed;top:0;right:-340px;width:320px;height:100vh;background:var(--bg);border-left:1px solid var(--border);z-index:200;display:flex;flex-direction:column;transition:right .3s ease;box-shadow:-4px 0 20px rgba(0,0,0,.08)}
+.hist-panel.open{right:0}
+.hist-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.hist-title{font-size:14px;font-weight:700;color:var(--txt)}
+.hist-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--txt3);padding:0}
+.hist-body{flex:1;overflow-y:auto;padding:12px}
+.hist-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.hist-item:hover{border-color:var(--green2);background:var(--green-light)}
+.hist-item-formula{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--code-color);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist-item-desc{font-size:11px;color:var(--txt3)}
+.hist-item-date{font-size:10px;color:var(--txt3);margin-top:2px}
+.hist-empty{text-align:center;padding:40px 20px;color:var(--txt3);font-size:13px}
+
 /* CHIPS */
-.chips-area{padding:0 24px 14px;max-width:700px;margin:0 auto;width:100%}
+.chips-area{padding:0 24px 14px;max-width:720px;margin:0 auto;width:100%}
 .chips-label{font-size:11px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{font-size:12px;font-weight:500;color:var(--txt2);background:var(--surface);border:1px solid var(--border2);padding:6px 12px;border-radius:100px;cursor:pointer;transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif}
@@ -116,15 +178,19 @@ body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',sans-
 
 /* INPUT */
 .input-area{padding:14px 24px 20px;border-top:1px solid var(--border);background:var(--bg);flex-shrink:0}
-.input-inner{max-width:700px;margin:0 auto}
+.input-inner{max-width:720px;margin:0 auto}
 .input-box{background:var(--surface);border:1.5px solid var(--border2);border-radius:12px;padding:12px 48px 12px 16px;display:flex;align-items:flex-end;position:relative;transition:all .2s}
-.input-box:focus-within{border-color:var(--green2);background:var(--bg);box-shadow:0 0 0 3px rgba(34,160,80,.08)}
+.input-box:focus-within{border-color:var(--green2);background:var(--bg);box-shadow:0 0 0 3px rgba(46,200,99,.08)}
 #msg-input{flex:1;background:transparent;border:none;outline:none;color:var(--txt);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;line-height:1.6;resize:none;max-height:120px}
 #msg-input::placeholder{color:var(--txt3)}
 .send-btn{position:absolute;right:10px;bottom:10px;width:34px;height:34px;border-radius:8px;border:none;background:var(--green);color:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .send-btn:disabled{background:var(--border2);color:var(--txt3);cursor:not-allowed}
 .send-btn:not(:disabled):hover{background:var(--green2);transform:scale(1.05)}
 .input-footer{margin-top:8px;font-size:11px;color:var(--txt3);text-align:center}
+
+/* OVERLAY */
+#hist-overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:190;display:none}
+
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -132,6 +198,18 @@ body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',sans-
 </style>
 </head>
 <body>
+
+<!-- HISTORICO OVERLAY -->
+<div id="hist-overlay" onclick="fecharHistorico()"></div>
+
+<!-- HISTORICO PANEL -->
+<div class="hist-panel" id="hist-panel">
+  <div class="hist-header">
+    <span class="hist-title">📋 Minhas Fórmulas</span>
+    <button class="hist-close" onclick="fecharHistorico()">✕</button>
+  </div>
+  <div class="hist-body" id="hist-body"></div>
+</div>
 
 <!-- LOGIN -->
 <div id="login-screen">
@@ -166,6 +244,8 @@ body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',sans-
     </div>
     <div class="header-right">
       <span class="plan-badge" id="plan-badge">✦ Pro</span>
+      <button class="btn-icon" onclick="abrirHistorico()" title="Minhas fórmulas">📋</button>
+      <button class="btn-icon" id="btn-dark" onclick="toggleDark()" title="Modo escuro">🌙</button>
       <a href="planilheiro-landing-final.html" class="btn-upgrade" id="btn-upgrade">Upgrade Pro</a>
       <button class="btn-sair" onclick="sair()">Sair</button>
     </div>
@@ -180,7 +260,7 @@ body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',sans-
   </div>
 
   <div class="info-bar" id="info-bar">
-    ⚡ Modo Pro — descreva sua planilha e vou gerar um arquivo Excel profissional com dashboard, gráficos e fórmulas prontos.
+    ⚡ Modo Pro — descreva sua planilha e vou criar um arquivo Excel profissional com dashboard, gráficos e fórmulas automáticas.
   </div>
   <div class="banner banner-warn" id="banner-warn"></div>
   <div class="banner banner-block" id="banner-block">
@@ -209,19 +289,19 @@ body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',sans-
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-//  CONFIGURAÇÃO — edite aqui
-// ═══════════════════════════════════════════════════════
-const SENHAS_BASICO  = ["BASICO2025","PLAN123","EXCEL001"];
-const SENHAS_PRO     = ["PRO2025","PLANPRO1","POWERBI01"];
-const LIMITE_BASICO  = 50;
+// ════════════════════════════════════════════════════════
+//  CONFIG — edite aqui
+// ════════════════════════════════════════════════════════
+const SENHAS_BASICO = ["BASICO2025","PLAN123","EXCEL001"];
+const SENHAS_PRO    = ["PRO2025","PLANPRO1","POWERBI01"];
+const LIMITE_BASICO = 50;
 
 const CHIPS_CHAT = [
+  "Diagnosticar erro na minha fórmula",
   "Como usar PROCV com duas condições?",
-  "Meu SE aninhado não funciona",
-  "Diferença entre ÍNDICE+CORRESP e PROCX",
   "SOMASES com múltiplos critérios",
-  "Fórmula para calcular variação %",
+  "Diferença entre ÍNDICE+CORRESP e PROCX",
+  "Traduzir fórmula Excel para Google Sheets",
   "Como travar referência de célula?"
 ];
 const CHIPS_GERADOR = [
@@ -233,104 +313,138 @@ const CHIPS_GERADOR = [
   "Controle de metas vs resultado"
 ];
 
-// ═══════════════════════════════════════════════════════
-//  PALETAS DE CORES (usadas no Excel gerado)
-// ═══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
+//  PALETAS
+// ════════════════════════════════════════════════════════
 const PALETTES = {
-  ocean:     { label:"Oceano",     dot:"#00BFA5", hdrBg:"1A3550", hdrFg:"FFFFFF", acc1:"00BFA5", acc2:"F5A623", acc3:"E84855", kpiBg:"1E3D5C", altRow:"EBF4FA", bodyBg:"F7FAFC", border:"C8D8E8" },
-  forest:    { label:"Floresta",   dot:"#2EC863", hdrBg:"1B3A2D", hdrFg:"FFFFFF", acc1:"2EC863", acc2:"F5A623", acc3:"E84855", kpiBg:"1F4435", altRow:"EAF6EE", bodyBg:"F7FBF8", border:"C4DDD0" },
-  midnight:  { label:"Meia-noite", dot:"#6C63FF", hdrBg:"1A1A2E", hdrFg:"E0E0FF", acc1:"6C63FF", acc2:"F5A623", acc3:"FF6584", kpiBg:"16213E", altRow:"F0F0FF", bodyBg:"F8F8FF", border:"C8C8E8" },
-  corporate: { label:"Corporativo",dot:"#2E75B6", hdrBg:"1F3864", hdrFg:"FFFFFF", acc1:"2E75B6", acc2:"ED7D31", acc3:"FF0000", kpiBg:"263F75", altRow:"DEEAF1", bodyBg:"F8FAFD", border:"BDD7EE" },
+  ocean:     {label:"Oceano",    dot:"#00BFA5",hdrBg:"1A3550",hdrFg:"FFFFFF",acc1:"00BFA5",acc2:"F5A623",acc3:"E84855",kpiBg:"1E3D5C",altRow:"EBF4FA",bodyBg:"F7FAFC",border:"C8D8E8"},
+  forest:    {label:"Floresta",  dot:"#2EC863",hdrBg:"1B3A2D",hdrFg:"FFFFFF",acc1:"2EC863",acc2:"F5A623",acc3:"E84855",kpiBg:"1F4435",altRow:"EAF6EE",bodyBg:"F7FBF8",border:"C4DDD0"},
+  midnight:  {label:"Meia-noite",dot:"#6C63FF",hdrBg:"1A1A2E",hdrFg:"E0E0FF",acc1:"6C63FF",acc2:"F5A623",acc3:"FF6584",kpiBg:"16213E",altRow:"F0F0FF",bodyBg:"F8F8FF",border:"C8C8E8"},
+  corporate: {label:"Corporativo",dot:"#2E75B6",hdrBg:"1F3864",hdrFg:"FFFFFF",acc1:"2E75B6",acc2:"ED7D31",acc3:"FF0000",kpiBg:"263F75",altRow:"DEEAF1",bodyBg:"F8FAFD",border:"BDD7EE"},
 };
 let selectedPalette = "ocean";
 
-// ═══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
 //  SYSTEM PROMPTS
-// ═══════════════════════════════════════════════════════
-const SYSTEM_CHAT = `Você é o Planilheiro, um agente especialista em Excel e Google Planilhas, focado em ajudar usuários a resolver problemas com fórmulas. Seu nível de explicação é claro, didático e prático, adaptado tanto para iniciantes quanto para intermediários.
+// ════════════════════════════════════════════════════════
+const SYSTEM_CHAT = `Você é o Planilheiro, agente especialista em Excel e Google Planilhas. Responde sempre em português do Brasil.
 
-NO PLANO BÁSICO você:
-1. Conserta fórmulas com erros — identifica o problema, explica o que estava errado e entrega a fórmula corrigida
-2. Explica fórmulas passo a passo com exemplos simples
-3. Trabalha com: SOMASE, SE, PROCV, PROCX, ÍNDICE, CORRESP, CONT.SE, FILTRO, ÚNICO, datas, textos, porcentagens
+CAPACIDADES:
+1. Diagnostica erros (#VALOR!, #REF!, #N/D, #DIV/0!, #NOME?) — explica a causa exata e como corrigir
+2. Conserta fórmulas — identifica o problema e entrega a versão corrigida
+3. Explica fórmulas passo a passo
+4. Trabalha com: SOMASE/S, SE, PROCV, PROCX, ÍNDICE+CORRESP, CONT.SE/S, FILTRO, ÚNICO, SEQUÊNCIA, datas, textos, porcentagens, referências
+5. Traduz fórmulas Excel → Google Sheets e vice-versa
 
-COMPORTAMENTO OBRIGATÓRIO:
-- Quando o usuário pedir uma fórmula ou ajuda, SEMPRE pergunte primeiro:
-  "Você prefere:
-  📋 Explicação completa passo a passo
-  ✅ Fórmula pronta para copiar e colar"
-- Só entregue a resposta DEPOIS que o usuário escolher
-- Se escolher passo a passo: numere cada etapa, use linguagem simples, dê exemplos
-- Se escolher fórmula pronta: entregue em bloco de código com breve explicação de cada parte
-- NÃO entregue arquivos no plano básico
+COMPORTAMENTO:
+- Quando receber uma fórmula com erro, identifique IMEDIATAMENTE o tipo (#VALOR! etc), a causa e a solução
+- Quando pedirem fórmula, pergunte: "Prefere 📋 Explicação passo a passo ou ✅ Fórmula pronta?"
+- Quando pedirem tradução para Google Sheets, entregue direto sem perguntar
+- Fórmulas prontas SEMPRE em bloco de código
+- Após entregar fórmula, sugira variações úteis
+- NÃO entregue arquivos — apenas fórmulas e explicações`;
 
-Responda sempre em português do Brasil.`;
+const SYSTEM_GERADOR = `Você é o Planilheiro Pro, especialista em criar planilhas Excel profissionais completas. Responda em português do Brasil.
 
-const SYSTEM_GERADOR = `Você é o Planilheiro Pro, um agente especialista em Excel que cria planilhas profissionais completas.
+FLUXO:
+Passo 1 – Colete informações (UMA pergunta por vez):
+1. Tipo? (financeiro, vendas, estoque, fluxo de caixa, projetos, RH, outro)
+2. Pessoal ou empresarial?
+3. Quais dados/categorias controlar?
+4. Período? (mensal, semanal, anual)
 
-FLUXO OBRIGATÓRIO:
+Passo 2 – Confirme a estrutura em 2-3 frases e peça confirmação.
 
-Passo 1 – Entender a necessidade (UMA pergunta por vez, de forma natural):
-1. Qual tipo de planilha? (financeiro pessoal, vendas, estoque, fluxo de caixa, projetos, RH, outro)
-2. Uso pessoal ou empresarial?
-3. Quais dados/categorias principais quer controlar?
-4. Período: mensal, semanal, anual?
+Passo 3 – Ao gerar, diga "Sua planilha está pronta! 🎉" e inclua o bloco abaixo.
 
-Passo 2 – Confirmar estrutura:
-Descreva em 2-3 frases o que vai entregar. Peça confirmação antes de gerar.
-
-Passo 3 – Gerar o arquivo:
-Escreva "Sua planilha está pronta! 🎉" e logo após gere EXATAMENTE o seguinte bloco (use EXATAMENTE essa tag de abertura):
-
+BLOCO OBRIGATÓRIO — use EXATAMENTE esta tag:
 \`\`\`planilha-pro
 {"palette":"ocean","filename":"nome-arquivo","dashboard":{"title":"Titulo","subtitle":"Subtitulo 2025","kpis":[{"label":"KPI","formula":"=Dados!C16","format":"currency","sublabel":"Jan-Dez","accent":"00BFA5"}]},"sheets":[{"name":"Dados","headers":["Mes","Receita","Despesa","Lucro"],"col_types":["text","currency","currency","currency"],"formula_cols":[3],"totals_row":true,"rows":[["Janeiro",5500,3200,"=C4-D4"],["Fevereiro",6000,3400,"=C5-D5"],["Marco",5800,3100,"=C6-D6"],["Abril",6200,3300,"=C7-D7"],["Maio",6500,3500,"=C8-D8"],["Junho",7000,3800,"=C9-D9"],["Julho",6800,3600,"=C10-D10"],["Agosto",7200,3900,"=C11-D11"],["Setembro",7500,4000,"=C12-D12"],["Outubro",7100,3800,"=C13-D13"],["Novembro",7800,4200,"=C14-D14"],["Dezembro",8500,4600,"=C15-D15"]]}]}
 \`\`\`
 
-ATENÇÃO — REGRA DE OURO: O JSON deve estar em UMA ÚNICA LINHA, sem quebras de linha dentro do bloco. Exatamente como o exemplo acima.
+REGRA DE OURO: JSON em UMA ÚNICA LINHA. Sem quebras de linha dentro do bloco.
 
-REGRAS DO JSON:
-- palette: "ocean" (azul-petróleo), "forest" (verde), "midnight" (roxo), "corporate" (azul corporativo)
-- filename: sem espaços, sem acentos, use hifens (ex: controle-financeiro-2025)
-- col_types por coluna: "text", "currency", "percent", "number"
-- formula_cols: lista de índices 0-based das colunas com fórmulas Excel
+REGRAS:
+- palette: "ocean","forest","midnight","corporate"
+- filename: sem espaços, sem acentos, hifens (ex: controle-financeiro-2025)
+- col_types: "text","currency","percent","number"
+- formula_cols: índices 0-based das colunas com fórmulas Excel
 - totals_row: sempre true
-- kpis[].format: "currency", "percent" ou "number"
-- kpis[].formula: referência à linha de TOTAL da aba. Os dados começam na linha 4 do Excel (linhas 1-2 são banner, linha 3 é cabeçalho). Com 12 meses de dados (linhas 4 a 15), o TOTAL fica na linha 16. Exemplo: "=Dados!C16"
-- rows: mínimo 12 linhas com dados realistas e fórmulas corretas
-- Fórmulas nas rows: linha 4 = primeiro dado, linha 15 = último (com 12 meses)
-- Sem acentos nas strings do JSON para evitar problemas de encoding
-- JSON 100% válido: aspas duplas, sem trailing commas, sem comentários
+- kpis[].format: "currency","percent","number"
+- kpis[].formula: linha TOTAL = linha 4 (1º dado) + N linhas de dados. Ex 12 meses → total linha 16 → "=Dados!C16"
+- rows: mínimo 12 linhas, dados realistas
+- Fórmulas: linha 4=jan, 5=fev...15=dez. Ex: "=C4-D4" para lucro de janeiro
+- JSON 100% válido: aspas duplas, sem trailing commas`;
 
-PALETA SUGERIDA:
-- Pessoal/Financeiro → "ocean" ou "forest"  
-- Empresarial → "corporate"
-- Moderno/Tech → "midnight"
+// ════════════════════════════════════════════════════════
+//  ESTADO
+// ════════════════════════════════════════════════════════
+let plano=null, modo="chat", loading=false;
+let historico={chat:[],gerador:[]};
 
-Responda sempre em português do Brasil.`;
+// ════════════════════════════════════════════════════════
+//  DARK MODE
+// ════════════════════════════════════════════════════════
+function toggleDark(){
+  const isDark=document.documentElement.getAttribute("data-theme")==="dark";
+  const next=isDark?"light":"dark";
+  document.documentElement.setAttribute("data-theme",next);
+  document.getElementById("btn-dark").textContent=isDark?"🌙":"☀️";
+  localStorage.setItem("pl_theme",next);
+}
+(function(){
+  const t=localStorage.getItem("pl_theme")||"light";
+  document.documentElement.setAttribute("data-theme",t);
+  // btn-dark ainda não existe aqui, será setado no iniciar()
+})();
 
-// ═══════════════════════════════════════════════════════
-//  ESTADO GLOBAL
-// ═══════════════════════════════════════════════════════
-let plano = null, modo = "chat", loading = false;
-let historico = { chat:[], gerador:[] };
+// ════════════════════════════════════════════════════════
+//  HISTÓRICO DE FÓRMULAS
+// ════════════════════════════════════════════════════════
+function getHistorico(){try{return JSON.parse(localStorage.getItem("pl_hist")||"[]")}catch{return[]}}
+function saveFormula(formula,desc){
+  const h=getHistorico();
+  h.unshift({formula,desc,date:new Date().toLocaleDateString("pt-BR")});
+  if(h.length>50)h.pop();
+  localStorage.setItem("pl_hist",JSON.stringify(h));
+}
+function abrirHistorico(){
+  const h=getHistorico();
+  const body=document.getElementById("hist-body");
+  if(h.length===0){body.innerHTML=`<div class="hist-empty">📭 Nenhuma fórmula salva ainda.<br/>As fórmulas geradas aparecem aqui automaticamente.</div>`;
+  }else{
+    body.innerHTML=h.map((item,i)=>`<div class="hist-item" onclick="usarFormula(${i})"><div class="hist-item-formula">${esc(item.formula)}</div><div class="hist-item-desc">${esc(item.desc||"Fórmula salva")}</div><div class="hist-item-date">${item.date}</div></div>`).join("");
+  }
+  document.getElementById("hist-panel").classList.add("open");
+  document.getElementById("hist-overlay").style.display="block";
+}
+function fecharHistorico(){
+  document.getElementById("hist-panel").classList.remove("open");
+  document.getElementById("hist-overlay").style.display="none";
+}
+function usarFormula(i){
+  const h=getHistorico();
+  if(h[i]){document.getElementById("msg-input").value=`Explica esta fórmula: ${h[i].formula}`;document.getElementById("send-btn").disabled=false;}
+  fecharHistorico();
+}
 
-// ═══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
 //  LOGIN
-// ═══════════════════════════════════════════════════════
-document.getElementById("senha-input").addEventListener("keydown", e => { if(e.key==="Enter") entrar(); });
-function togglePass(){ const i=document.getElementById("senha-input"); i.type=i.type==="password"?"text":"password"; }
-
+// ════════════════════════════════════════════════════════
+document.getElementById("senha-input").addEventListener("keydown",e=>{if(e.key==="Enter")entrar();});
+function togglePass(){const i=document.getElementById("senha-input");i.type=i.type==="password"?"text":"password";}
 function entrar(){
-  const s = document.getElementById("senha-input").value.trim().toUpperCase();
-  if(SENHAS_PRO.map(x=>x.toUpperCase()).includes(s))    { plano="pro";    iniciar(); return; }
-  if(SENHAS_BASICO.map(x=>x.toUpperCase()).includes(s)) { plano="basico"; iniciar(); return; }
+  const s=document.getElementById("senha-input").value.trim().toUpperCase();
+  if(SENHAS_PRO.map(x=>x.toUpperCase()).includes(s)){plano="pro";iniciar();return;}
+  if(SENHAS_BASICO.map(x=>x.toUpperCase()).includes(s)){plano="basico";iniciar();return;}
   document.getElementById("error-msg").style.display="block";
   document.getElementById("senha-input").value="";
 }
-
 function iniciar(){
   document.getElementById("login-screen").style.display="none";
   document.getElementById("app-screen").style.display="flex";
+  const t=localStorage.getItem("pl_theme")||"light";
+  document.getElementById("btn-dark").textContent=t==="dark"?"☀️":"🌙";
   if(plano==="basico"){
     document.getElementById("brand-plan-text").textContent="Plano Básico";
     document.getElementById("plan-badge").textContent="⚡ Básico";
@@ -338,277 +452,231 @@ function iniciar(){
     document.getElementById("tab-pro").style.display="inline";
     document.getElementById("tab-gerador").disabled=true;
   }
-  const msg = plano==="pro"
-    ? "Olá! 👋 Sou o **Planilheiro** — mande qualquer dúvida sobre **fórmulas**, **erros** ou **DAX**.\n\n✦ **Plano Pro ativo** — use a aba **⚡ Gerar Planilha** para receber arquivos Excel profissionais com dashboard e gráficos!"
-    : "Olá! 👋 Sou o **Planilheiro** — mande qualquer dúvida sobre **fórmulas**, **erros** ou **DAX**.\n\n⚡ **Plano Básico** — "+Math.max(0,LIMITE_BASICO-getUsos())+" perguntas restantes hoje.";
-  exibeMsg("assistant", msg);
-  renderChips();
-  checkBanners();
+  const msg=plano==="pro"
+    ?"Olá! 👋 Sou o **Planilheiro** — mande qualquer dúvida sobre **fórmulas**, **erros** ou **DAX**.\n\n✦ **Plano Pro ativo** — use ⚡ **Gerar Planilha** para receber arquivos Excel profissionais com dashboard e gráficos!\n\n📋 Use o botão **Minhas Fórmulas** no topo para acessar o histórico das suas fórmulas."
+    :"Olá! 👋 Sou o **Planilheiro** — mande qualquer dúvida sobre **fórmulas**, **erros** ou **DAX**.\n\n⚡ **Plano Básico** — "+Math.max(0,LIMITE_BASICO-getUsos())+" perguntas restantes hoje.";
+  exibeMsg("assistant",msg);
+  renderChips();checkBanners();
 }
+function sair(){location.reload();}
 
-function sair(){ location.reload(); }
-
-// ═══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
 //  TABS
-// ═══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
 function setMode(m){
-  if(m==="gerador" && plano==="basico") return;
-  modo = m;
-  document.getElementById("tab-chat").classList.toggle("active", m==="chat");
-  document.getElementById("tab-gerador").classList.toggle("active", m==="gerador");
-  document.getElementById("info-bar").style.display = m==="gerador"?"block":"none";
-  document.getElementById("msg-input").placeholder = m==="chat"
-    ? "Cole sua fórmula, descreva o erro ou faça uma pergunta..."
-    : "Ex: quero um controle financeiro pessoal com receitas e despesas mensais...";
-  document.getElementById("chips-label").textContent = m==="chat"?"Perguntas frequentes":"Exemplos";
+  if(m==="gerador"&&plano==="basico")return;
+  modo=m;
+  document.getElementById("tab-chat").classList.toggle("active",m==="chat");
+  document.getElementById("tab-gerador").classList.toggle("active",m==="gerador");
+  document.getElementById("info-bar").style.display=m==="gerador"?"block":"none";
+  document.getElementById("msg-input").placeholder=m==="chat"
+    ?"Cole sua fórmula, descreva o erro ou faça uma pergunta..."
+    :"Ex: quero um controle financeiro pessoal com receitas e despesas mensais...";
+  document.getElementById("chips-label").textContent=m==="chat"?"Perguntas frequentes":"Exemplos";
   document.getElementById("chat-inner").innerHTML="";
   if(historico[modo].length===0){
-    const bv = m==="gerador"
-      ? "Pronto para criar sua **planilha profissional**! 🚀\n\nVou entregar um arquivo Excel com:\n- ✦ **Dashboard** com KPIs visuais e cores\n- ✦ **Gráficos** automáticos\n- ✦ **Fórmulas** prontas\n- ✦ **Design** profissional\n\nMe conta: **que tipo de planilha você precisa?**"
-      : "Olá! 👋 Sou o **Planilheiro** — mande qualquer dúvida sobre **fórmulas** ou **erros**.";
-    exibeMsg("assistant", bv);
-  } else {
-    historico[modo].forEach(msg => exibeMsg(msg.role, msg.content));
-  }
-  renderChips();
-  checkBanners();
+    const bv=m==="gerador"
+      ?"Pronto para criar sua **planilha profissional**! 🚀\n\nVou entregar um arquivo Excel com:\n- ✦ **Dashboard** com KPIs coloridos e métricas\n- ✦ **Gráficos** de barras e linhas prontos\n- ✦ **Fórmulas** automáticas funcionando\n- ✦ **Formatação condicional** (verde/vermelho)\n- ✦ **4 temas** para escolher\n\nMe conta: **que tipo de planilha você precisa?**"
+      :"Olá! 👋 Sou o **Planilheiro** — mande qualquer dúvida sobre **fórmulas** ou **erros**.\n\nPosso **diagnosticar erros**, **criar fórmulas**, **explicar passo a passo** e **traduzir para Google Sheets**.";
+    exibeMsg("assistant",bv);
+  }else{historico[modo].forEach(msg=>exibeMsg(msg.role,msg.content));}
+  renderChips();checkBanners();
 }
 
-// ═══════════════════════════════════════════════════════
-//  PARSE DO JSON DO CLAUDE — parser robusto
-// ═══════════════════════════════════════════════════════
-
-// Extrai o conteúdo bruto entre qualquer variação de bloco de código
+// ════════════════════════════════════════════════════════
+//  PARSER JSON — robusto para qualquer formato do Claude
+// ════════════════════════════════════════════════════════
 function extrairBlocoRaw(text){
-  // Aceita qualquer uma dessas tags que o Claude possa usar
-  const TAGS = ["```planilha-pro", "```json", "```planilha", "```"];
+  const TAGS=["```planilha-pro","```json","```planilha","```"];
   for(const tag of TAGS){
-    const si = text.indexOf(tag);
-    if(si === -1) continue;
-    const after = text.substring(si + tag.length);
-    // Pula primeira linha se for apenas o nome da linguagem
-    const firstNL = after.indexOf("\n");
-    const content = firstNL !== -1 ? after.substring(firstNL+1) : after;
-    const closeIdx = content.indexOf("```");
-    const raw = closeIdx !== -1 ? content.substring(0, closeIdx) : content;
-    if(raw.trim().startsWith("{")) return { raw: raw.trim(), tagStart: si, tagEnd: si + tag.length + (firstNL !== -1 ? firstNL+1 : 0) + (closeIdx !== -1 ? closeIdx + 3 : raw.length) };
+    const si=text.indexOf(tag);if(si===-1)continue;
+    const after=text.substring(si+tag.length);
+    const firstNL=after.indexOf("\n");
+    const content=firstNL!==-1?after.substring(firstNL+1):after;
+    const closeIdx=content.indexOf("```");
+    const raw=closeIdx!==-1?content.substring(0,closeIdx):content;
+    if(raw.trim().startsWith("{"))return raw.trim();
   }
-  // Último recurso: tenta achar qualquer { } que pareça JSON com "sheets"
-  const m = text.match(/\{[\s\S]*?"sheets"[\s\S]*?\}/);
-  if(m) return { raw: m[0], tagStart: text.indexOf(m[0]), tagEnd: text.indexOf(m[0]) + m[0].length };
-  return null;
+  const m=text.match(/\{[\s\S]*?"sheets"[\s\S]*?\}/);
+  return m?m[0]:null;
 }
-
-function extrairJSON(text){
-  const found = extrairBlocoRaw(text);
-  if(!found) return null;
-  const raw = found.raw;
-
-  // Estratégia 1: parse direto (funciona se o JSON está bem formatado)
-  try{ const p=JSON.parse(raw); if(p&&p.sheets) return p; }catch(e){}
-
-  // Estratégia 2: limpeza conservadora — só remove chars de controle FORA de strings
-  try{
-    const cleaned = limpezaConservadora(raw);
-    const p = JSON.parse(cleaned);
-    if(p&&p.sheets) return p;
-  }catch(e){}
-
-  // Estratégia 3: limpeza agressiva — achata tudo em uma linha
-  try{
-    let s = raw
-      .replace(/[\u0000-\u001F\u007F-\u009F]/g, " ")
-      .replace(/,\s*}/g,"}").replace(/,\s*]/g,"]")
-      .replace(/\s+/g," ").trim();
-    const p = JSON.parse(s);
-    if(p&&p.sheets) return p;
-  }catch(e){}
-
-  // Estratégia 4: regex para extrair o objeto JSON
-  try{
-    const m = raw.match(/(\{[\s\S]*\})/);
-    if(m){
-      const p = JSON.parse(m[1]);
-      if(p&&p.sheets) return p;
-    }
-  }catch(e){}
-
-  console.error("[Planilheiro] JSON parse falhou. Raw:", raw.substring(0,500));
-  return null;
-}
-
-// Limpeza que preserva conteúdo dentro de strings JSON
 function limpezaConservadora(str){
-  let result = "";
-  let inString = false;
-  let escaped = false;
+  let result="",inString=false,escaped=false;
   for(let i=0;i<str.length;i++){
-    const c = str[i];
-    if(escaped){ result += c; escaped=false; continue; }
-    if(c==="\\" && inString){ result += c; escaped=true; continue; }
-    if(c==='"'){ inString=!inString; result+=c; continue; }
-    if(inString){
-      // Dentro de string: substitui quebras de linha por espaço (JSON não permite literal \n em strings)
-      if(c==="\n"||c==="\r"){ result+=" "; continue; }
-      result+=c;
-    } else {
-      // Fora de string: remove chars de controle mas preserva estrutura
-      if(c==="\n"||c==="\r"||c==="\t"){ result+=" "; continue; }
-      result+=c;
-    }
+    const c=str[i];
+    if(escaped){result+=c;escaped=false;continue;}
+    if(c==="\\"&&inString){result+=c;escaped=true;continue;}
+    if(c==='"'){inString=!inString;result+=c;continue;}
+    if(inString){if(c==="\n"||c==="\r"){result+=" ";continue;}result+=c;}
+    else{if(c==="\n"||c==="\r"||c==="\t"){result+=" ";continue;}result+=c;}
   }
   return result;
 }
-
+function extrairJSON(text){
+  const raw=extrairBlocoRaw(text);if(!raw)return null;
+  for(const attempt of[
+    ()=>JSON.parse(raw),
+    ()=>JSON.parse(limpezaConservadora(raw)),
+    ()=>JSON.parse(raw.replace(/[\u0000-\u001F\u007F-\u009F]/g," ").replace(/,\s*}/g,"}").replace(/,\s*]/g,"]").replace(/\s+/g," ").trim()),
+    ()=>{const m=raw.match(/(\{[\s\S]*\})/);return m?JSON.parse(m[1]):null;}
+  ]){try{const p=attempt();if(p&&p.sheets)return p;}catch(e){}}
+  console.error("[Planilheiro] Parse falhou:",raw.substring(0,300));
+  return null;
+}
 function limparBloco(text){
-  const found = extrairBlocoRaw(text);
-  if(!found) return text;
-  // Remove tudo desde a abertura do bloco até o fechamento
-  const TAGS = ["```planilha-pro", "```json", "```planilha", "```"];
+  const TAGS=["```planilha-pro","```json","```planilha","```"];
   for(const tag of TAGS){
-    const si = text.indexOf(tag);
-    if(si === -1) continue;
-    const after = text.substring(si + tag.length);
-    const ci = after.indexOf("```");
-    if(ci !== -1){
-      const end = si + tag.length + ci + 3;
-      return (text.substring(0, si) + text.substring(end)).trim();
-    }
+    const si=text.indexOf(tag);if(si===-1)continue;
+    const after=text.substring(si+tag.length);
+    const ci=after.indexOf("```");
+    if(ci!==-1)return(text.substring(0,si)+text.substring(si+tag.length+ci+3)).trim();
   }
   return text;
 }
 
-// ═══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
+//  GERADOR DE GRÁFICO PNG via Chart.js
+// ════════════════════════════════════════════════════════
+async function gerarGraficoPNG(sheetDef,palette){
+  return new Promise(resolve=>{
+    const p=PALETTES[palette]||PALETTES.ocean;
+    const rows=sheetDef.rows||[];
+    const headers=sheetDef.headers||[];
+    const colTypes=sheetDef.col_types||[];
+
+    // Extrai categorias (col 0) e dados numéricos (cols currency/number)
+    const labels=rows.map(r=>String(r[0]||""));
+    const dataCols=[];
+    for(let ci=1;ci<headers.length;ci++){
+      const typ=colTypes[ci];
+      if(typ==="currency"||typ==="number"){
+        const values=rows.map(r=>{
+          const v=r[ci];
+          if(typeof v==="number")return v;
+          if(typeof v==="string"&&v.startsWith("="))return null; // fórmula
+          return Number(v)||0;
+        });
+        if(values.some(v=>v!==null&&v>0))dataCols.push({label:headers[ci],data:values});
+      }
+    }
+    if(dataCols.length===0){resolve(null);return;}
+
+    const canvas=document.createElement("canvas");
+    canvas.width=900;canvas.height=420;
+    const ctx=canvas.getContext("2d");
+
+    // Fundo branco
+    ctx.fillStyle="#FFFFFF";ctx.fillRect(0,0,900,420);
+
+    const accents=["#"+p.acc1,"#"+p.acc2,"#"+p.acc3,"#7F77DD","#27AE60"];
+    const alphaAccents=accents.map(c=>c+"99");
+
+    const datasets=dataCols.slice(0,3).map((dc,i)=>({
+      label:dc.label,
+      data:dc.data.map(v=>v??0),
+      backgroundColor:alphaAccents[i%alphaAccents.length],
+      borderColor:accents[i%accents.length],
+      borderWidth:2,
+      borderRadius:4,
+    }));
+
+    new Chart(ctx,{
+      type:"bar",
+      data:{labels,datasets},
+      options:{
+        responsive:false,
+        animation:false,
+        plugins:{
+          legend:{position:"top",labels:{font:{size:12,family:"Calibri"},color:"#333"}},
+          title:{display:false}
+        },
+        scales:{
+          x:{ticks:{font:{size:11},color:"#555"},grid:{display:false}},
+          y:{ticks:{font:{size:11},color:"#555"},grid:{color:"#eeeeee"}}
+        }
+      }
+    });
+
+    // Aguarda um tick para o Chart.js renderizar
+    setTimeout(()=>{resolve(canvas.toDataURL("image/png"));},100);
+  });
+}
+
+// ════════════════════════════════════════════════════════
 //  GERADOR DE EXCEL COM EXCELJS
-// ═══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
+const NUM_FMT={currency:'"R$"#,##0.00',percent:'0.0%',number:'#,##0.00',text:'@',date:'dd/mm/yyyy'};
 
-// Formatos de número
-const NUM_FMT = {
-  currency: '"R$"#,##0.00',
-  percent:  '0.0%',
-  number:   '#,##0.00',
-  text:     '@',
-  date:     'dd/mm/yyyy',
-};
+function hx(hex){return{argb:"FF"+hex.replace("#","").toUpperCase()};}
+function fg(hex){return{type:"pattern",pattern:"solid",fgColor:hx(hex)};}
+function mkFont(color,size=10,bold=false){return{name:"Calibri",bold,size,color:hx(color)};}
+function mkAlign(h="left",v="middle",wrap=false){return{horizontal:h,vertical:v,wrapText:wrap};}
+function mkBorderFull(color="CCCCCC"){const s={style:"thin",color:hx(color)};return{top:s,left:s,bottom:s,right:s};}
+function mkBorderBottom(color="DDDDDD"){return{bottom:{style:"thin",color:hx(color)}};}
+function colLetter(n){return String.fromCharCode(64+n);}// 1=A,2=B...
 
-function hexColor(hex){ return { argb: "FF"+hex.replace("#","").toUpperCase() }; }
-function fgColor(hex){ return { type:"pattern", pattern:"solid", fgColor:hexColor(hex) }; }
+async function gerarExcel(payload,palette){
+  const p=PALETTES[palette]||PALETTES.ocean;
+  const wb=new ExcelJS.Workbook();
+  wb.creator="O Planilheiro Pro";wb.created=new Date();
 
-function hdrFont(p, size=11, bold=true){
-  return { name:"Calibri", bold, size, color:hexColor(p.hdrFg) };
-}
-function bodyFont(size=10, bold=false, color="1A1A1A"){
-  return { name:"Calibri", bold, size, color:hexColor(color) };
-}
-function centerAlign(wrapText=false){
-  return { horizontal:"center", vertical:"middle", wrapText };
-}
-function leftAlign(){
-  return { horizontal:"left", vertical:"middle" };
-}
-function rightAlign(){
-  return { horizontal:"right", vertical:"middle" };
-}
-function thinBorder(color="CCCCCC"){
-  const s={ style:"thin", color:hexColor(color) };
-  return { top:s, left:s, bottom:s, right:s };
-}
-function bottomBorder(color="DDDDDD"){
-  const s={ style:"thin", color:hexColor(color) };
-  return { bottom:s };
-}
-
-async function gerarExcel(payload, palette){
-  const p = PALETTES[palette] || PALETTES.ocean;
-  const wb = new ExcelJS.Workbook();
-  wb.creator = "O Planilheiro";
-  wb.created = new Date();
-
-  // ── 1. ABA INSTRUÇÕES ──────────────────────────────────
-  const wi = wb.addWorksheet("Instruções");
-  wi.views = [{ showGridLines:false }];
-  wi.getColumn(1).width = 3;
-  wi.getColumn(2).width = 68;
-  wi.tabColor = hexColor(p.acc1);
-
-  const wsTitle = wi.getRow(2);
-  wsTitle.height = 44;
+  // ── ABA INSTRUÇÕES ─────────────────────────────────
+  const wi=wb.addWorksheet("Instruções");
+  wi.views=[{showGridLines:false}];wi.tabColor=hx(p.acc1);
+  wi.getColumn(1).width=3;wi.getColumn(2).width=66;
   wi.mergeCells("B2:J2");
-  const tc = wi.getCell("B2");
-  tc.value = "📋  GUIA DE USO  —  O Planilheiro Pro";
-  tc.font = { name:"Calibri", bold:true, size:18, color:hexColor(p.hdrFg) };
-  tc.fill = fgColor(p.hdrBg);
-  tc.alignment = { horizontal:"left", vertical:"middle", indent:1 };
-
-  wi.mergeCells("B3:J3");
-  wi.getCell("B3").fill = fgColor(p.acc1);
-  wi.getRow(3).height = 5;
-
-  const steps = [
-    ["📌 Como usar", "Esta planilha foi gerada pelo Planilheiro Pro. Siga as instruções abaixo para personalizar."],
-    ["1️⃣  Aba de dados", "Substitua os valores de exemplo pelos seus dados reais. Não altere as células com fórmulas."],
-    ["2️⃣  Dashboard", "O dashboard atualiza automaticamente. Não precisa editar nada lá."],
-    ["💡 Exportar PDF", "Arquivo → Exportar como PDF. Recomendamos orientação paisagem, escala 85%."],
-    ["📞 Suporte", "Dúvidas? Volte ao Planilheiro e descreva o que precisa ajustar."],
+  const tc=wi.getCell("B2");
+  tc.value="📋  GUIA DE USO  —  O Planilheiro Pro";
+  tc.font=mkFont(p.hdrFg,18,true);tc.fill=fg(p.hdrBg);
+  tc.alignment=mkAlign("left","middle",false);wi.getRow(2).height=44;
+  wi.mergeCells("B3:J3");wi.getCell("B3").fill=fg(p.acc1);wi.getRow(3).height=5;
+  const steps=[
+    ["📌 Como usar","Esta planilha foi gerada pelo Planilheiro Pro. Dados de exemplo incluídos — substitua pelos seus."],
+    ["1️⃣  Aba de dados","Edite os valores nas colunas de entrada. Colunas com fórmulas recalculam automaticamente."],
+    ["2️⃣  Dashboard","O dashboard exibe KPIs e gráficos calculados a partir dos dados inseridos."],
+    ["3️⃣  Formatação","Células verdes = positivo, vermelhas = negativo. Atualiza automaticamente."],
+    ["💡 Exportar","Arquivo → Exportar como PDF. Use orientação paisagem, escala 85%."],
   ];
   let row=5;
-  for(const [title,desc] of steps){
+  for(const[t,d]of steps){
     wi.mergeCells(`B${row}:J${row}`);
-    const ct=wi.getCell(`B${row}`);
-    ct.value="  "+title; ct.font={name:"Calibri",bold:true,size:11,color:hexColor(p.acc1)};
-    ct.fill=fgColor("EAF7F3"); ct.alignment={horizontal:"left",vertical:"middle"};
-    wi.getRow(row).height=24; row++;
+    const ct=wi.getCell(`B${row}`);ct.value="  "+t;ct.font=mkFont(p.acc1,11,true);
+    ct.fill=fg("EAF7F3");ct.alignment=mkAlign("left");wi.getRow(row).height=24;row++;
     wi.mergeCells(`B${row}:J${row}`);
-    const cd=wi.getCell(`B${row}`);
-    cd.value=desc; cd.font={name:"Calibri",size:10,color:hexColor("1A1A1A")};
-    cd.fill=fgColor(p.bodyBg); cd.alignment={horizontal:"left",vertical:"middle",wrapText:true};
-    wi.getRow(row).height=38; row+=2;
+    const cd=wi.getCell(`B${row}`);cd.value=d;cd.font=mkFont("1A1A1A",10);
+    cd.fill=fg(p.bodyBg);cd.alignment=mkAlign("left","middle",true);wi.getRow(row).height=38;row+=2;
   }
 
-  // ── 2. ABAS DE DADOS ───────────────────────────────────
-  const sheetRefs = {}; // para referências do dashboard
+  // ── ABAS DE DADOS ───────────────────────────────────
+  for(const sheetDef of(payload.sheets||[])){
+    const wsName=sheetDef.name||"Dados";
+    const headers=sheetDef.headers||[];
+    const rows=sheetDef.rows||[];
+    const colTypes=sheetDef.col_types||headers.map(()=>"text");
+    const fmulCols=new Set(sheetDef.formula_cols||[]);
+    const doTotals=sheetDef.totals_row!==false;
+    const nCols=headers.length;
 
-  for(const sheetDef of (payload.sheets||[])){
-    const wsName  = sheetDef.name || "Dados";
-    const headers = sheetDef.headers || [];
-    const rows    = sheetDef.rows || [];
-    const colTypes= sheetDef.col_types || headers.map(()=>"text");
-    const fmulCols= new Set(sheetDef.formula_cols||[]);
-    const doTotals= sheetDef.totals_row !== false;
-    const nCols   = headers.length;
+    const ws=wb.addWorksheet(wsName);
+    ws.views=[{showGridLines:false}];ws.tabColor=hx(p.acc1);
 
-    const ws = wb.addWorksheet(wsName);
-    ws.views = [{ showGridLines:false }];
-    ws.tabColor = hexColor(p.acc1);
+    // Banner
+    ws.mergeCells(1,1,1,Math.max(nCols,8));
+    const bnr=ws.getCell(1,1);bnr.value="  "+wsName.toUpperCase();
+    bnr.font=mkFont(p.hdrFg,14,true);bnr.fill=fg(p.hdrBg);
+    bnr.alignment=mkAlign("left","middle");ws.getRow(1).height=36;
+    ws.mergeCells(2,1,2,Math.max(nCols,8));ws.getCell(2,1).fill=fg(p.acc1);ws.getRow(2).height=4;
 
-    // Título da aba (rows 1–2)
-    ws.mergeCells(1,1,1,Math.max(nCols,6));
-    const bnr=ws.getCell(1,1);
-    bnr.value="  "+wsName.toUpperCase();
-    bnr.font={name:"Calibri",bold:true,size:14,color:hexColor(p.hdrFg)};
-    bnr.fill=fgColor(p.hdrBg);
-    bnr.alignment={horizontal:"left",vertical:"middle",indent:1};
-    ws.getRow(1).height=36;
-
-    ws.mergeCells(2,1,2,Math.max(nCols,6));
-    ws.getCell(2,1).fill=fgColor(p.acc1);
-    ws.getRow(2).height=4;
-
-    // Cabeçalhos (row 3)
+    // Headers (row 3)
     ws.getRow(3).height=30;
     for(let ci=0;ci<nCols;ci++){
-      const c=ws.getCell(3,ci+1);
-      c.value=headers[ci];
-      c.font=hdrFont(p,10,true);
-      c.fill=fgColor(p.hdrBg);
-      c.alignment=centerAlign(true);
-      c.border=thinBorder(p.border);
-      // largura da coluna
-      const w=Math.max((headers[ci]||"").length+6, 14);
-      ws.getColumn(ci+1).width=w;
+      const c=ws.getCell(3,ci+1);c.value=headers[ci];
+      c.font=mkFont(p.hdrFg,10,true);c.fill=fg(p.hdrBg);
+      c.alignment=mkAlign("center","middle",true);c.border=mkBorderFull(p.border);
+      ws.getColumn(ci+1).width=Math.max((headers[ci]||"").length+6,14);
     }
 
-    // Dados (a partir da row 4)
+    // Dados (row 4+)
     const DATA_START=4;
     for(let ri=0;ri<rows.length;ri++){
       const excelRow=DATA_START+ri;
@@ -620,374 +688,400 @@ async function gerarExcel(payload, palette){
         const c=ws.getCell(excelRow,ci+1);
         let val=rowData[ci]!==undefined?rowData[ci]:"";
 
-        // Fórmulas: string que começa com "=" deve ser objeto {formula:...} no ExcelJS
-        // ExcelJS NÃO aceita o "=" no início — só a expressão pura
-        if(typeof val==="string" && val.startsWith("=")){
-          c.value={ formula: val.substring(1) };
-        } else {
+        // CORREÇÃO PRINCIPAL: fórmulas como objeto {formula, result}
+        // O "result:0" força o Excel a recalcular ao abrir
+        if(typeof val==="string"&&val.startsWith("=")){
+          c.value={formula:val.substring(1),result:0};
+        }else{
           c.value=val;
         }
 
-        c.fill=fgColor(bg);
-        c.font=bodyFont(10, fmulCols.has(ci), fmulCols.has(ci)?p.hdrBg:"1A1A1A");
-        c.alignment=ci===0?leftAlign():rightAlign();
-        c.border=bottomBorder(p.border);
-        // Aplica formato numérico — inclusive em colunas de fórmula
+        c.fill=fg(bg);
+        c.font=mkFont(fmulCols.has(ci)?p.hdrBg:"1A1A1A",10,fmulCols.has(ci));
+        c.alignment=ci===0?mkAlign("left"):mkAlign("right");
+        c.border=mkBorderBottom(p.border);
         const fmt=NUM_FMT[colTypes[ci]||"text"];
-        if(fmt && fmt!=="@") c.numFmt=fmt;
+        if(fmt&&fmt!=="@")c.numFmt=fmt;
       }
     }
 
-    // Linha de totais
+    // Linha TOTAL
     const totalRow=DATA_START+rows.length;
-    sheetRefs[wsName]=totalRow; // guarda referência para o dashboard
-
-    if(doTotals && rows.length>0){
+    if(doTotals&&rows.length>0){
       ws.getRow(totalRow).height=28;
       for(let ci=0;ci<nCols;ci++){
         const c=ws.getCell(totalRow,ci+1);
+        const cl=colLetter(ci+1);
+        const typ=colTypes[ci]||"text";
         if(ci===0){
           c.value="TOTAL";
-          c.alignment={horizontal:"left",vertical:"middle",indent:1};
-        } else {
-          const colL=String.fromCharCode(64+ci+1); // A=65, col 2 = B
-          const typ=colTypes[ci];
-          if(typ==="currency"||typ==="number"){
-            c.value={ formula:`SUM(${colL}${DATA_START}:${colL}${totalRow-1})` };
-            if(NUM_FMT[typ]) c.numFmt=NUM_FMT[typ];
-          } else if(typ==="percent"){
-            // média ponderada aproximada: média simples
-            c.value={ formula:`AVERAGE(${colL}${DATA_START}:${colL}${totalRow-1})` };
-            c.numFmt=NUM_FMT.percent;
-          }
+          c.alignment=mkAlign("left","middle");
+        }else if(typ==="currency"||typ==="number"){
+          c.value={formula:`SUM(${cl}${DATA_START}:${cl}${totalRow-1})`,result:0};
+          c.numFmt=NUM_FMT[typ];
+        }else if(typ==="percent"){
+          c.value={formula:`AVERAGE(${cl}${DATA_START}:${cl}${totalRow-1})`,result:0};
+          c.numFmt=NUM_FMT.percent;
         }
-        c.font={name:"Calibri",bold:true,size:10,color:hexColor(p.hdrFg)};
-        c.fill=fgColor(p.hdrBg);
-        c.alignment=ci===0?{horizontal:"left",vertical:"middle",indent:1}:{horizontal:"right",vertical:"middle"};
+        c.font=mkFont(p.hdrFg,10,true);c.fill=fg(p.hdrBg);
+        c.alignment=ci===0?mkAlign("left","middle"):mkAlign("right","middle");
       }
     }
 
-    // Formatos de coluna finais (largura mínima)
-    ws.getColumn(1).width=Math.max(ws.getColumn(1).width||12, 13);
+    // FORMATAÇÃO CONDICIONAL — verde se positivo, vermelho se negativo
+    for(let ci=1;ci<nCols;ci++){
+      const typ=colTypes[ci]||"text";
+      if(typ==="currency"||typ==="number"){
+        const cl=colLetter(ci+1);
+        const range=`${cl}${DATA_START}:${cl}${DATA_START+rows.length-1}`;
+        // Positivo → verde suave
+        ws.addConditionalFormatting({ref:range,rules:[{
+          type:"cellIs",operator:"greaterThan",formulae:[0],
+          style:{fill:{type:"pattern",pattern:"solid",bgColor:{argb:"FFD4EDDA"}},
+                 font:{color:{argb:"FF155724"}}}
+        }]});
+        // Negativo → vermelho suave
+        ws.addConditionalFormatting({ref:range,rules:[{
+          type:"cellIs",operator:"lessThan",formulae:[0],
+          style:{fill:{type:"pattern",pattern:"solid",bgColor:{argb:"FFF8D7DA"}},
+                 font:{color:{argb:"FF721C24"}}}
+        }]});
+      }
+    }
+
+    // Largura mínima col 1
+    ws.getColumn(1).width=Math.max(ws.getColumn(1).width||12,13);
   }
 
-  // ── 3. ABA DASHBOARD ──────────────────────────────────
+  // ── ABA DASHBOARD ───────────────────────────────────
   if(payload.dashboard){
     const dash=payload.dashboard;
     const wd=wb.addWorksheet("Dashboard");
-    wd.views=[{showGridLines:false}];
-    wd.tabColor=hexColor(p.acc2);
+    wd.views=[{showGridLines:false}];wd.tabColor=hx(p.acc2);
 
     // Título
     wd.mergeCells("A1:N1");
     const dt=wd.getCell("A1");
     dt.value="  📊  "+(dash.title||"Dashboard").toUpperCase();
-    dt.font={name:"Calibri",bold:true,size:20,color:hexColor(p.hdrFg)};
-    dt.fill=fgColor(p.hdrBg);
-    dt.alignment={horizontal:"left",vertical:"middle",indent:1};
-    wd.getRow(1).height=52;
-
-    wd.mergeCells("A2:N2");
-    wd.getCell("A2").fill=fgColor(p.acc1);
-    wd.getRow(2).height=5;
-
+    dt.font=mkFont(p.hdrFg,20,true);dt.fill=fg(p.hdrBg);
+    dt.alignment=mkAlign("left","middle");wd.getRow(1).height=52;
+    wd.mergeCells("A2:N2");wd.getCell("A2").fill=fg(p.acc1);wd.getRow(2).height=5;
     wd.mergeCells("A3:N3");
-    const ds=wd.getCell("A3");
-    ds.value="  "+(dash.subtitle||"Visão Executiva");
-    ds.font={name:"Calibri",size:11,italic:true,color:hexColor("7090A0")};
-    ds.fill=fgColor(p.bodyBg);
-    ds.alignment={horizontal:"left",vertical:"middle",indent:1};
-    wd.getRow(3).height=22;
+    const ds=wd.getCell("A3");ds.value="  "+(dash.subtitle||"Visão Executiva");
+    ds.font={name:"Calibri",italic:true,size:11,color:hx("7090A0")};
+    ds.fill=fg(p.bodyBg);ds.alignment=mkAlign("left","middle");wd.getRow(3).height=22;
     wd.getRow(4).height=10;
 
     // KPI Cards
     const kpis=dash.kpis||[];
-    const CARD_W=3; // colunas por card
+    const CARD_W=3;
     const colors=[p.acc1,p.acc2,p.acc3];
 
-    for(let ki=0;ki<kpis.length;ki++){
+    for(let ki=0;ki<kpis.length&&ki<4;ki++){
       const kpi=kpis[ki];
-      const cs=1+ki*(CARD_W+1);
-      const ce=cs+CARD_W-1;
+      const cs=1+ki*(CARD_W+1);const ce=cs+CARD_W-1;
       const accent=kpi.accent||colors[ki%3];
 
-      // Label (row 5)
       wd.mergeCells(5,cs,5,ce);
-      const cl=wd.getCell(5,cs);
-      cl.value=(kpi.label||"KPI").toUpperCase();
-      cl.font={name:"Calibri",bold:true,size:8,color:hexColor("AABBCC")};
-      cl.fill=fgColor(p.kpiBg);
-      cl.alignment=centerAlign();
-      wd.getRow(5).height=18;
+      const cl=wd.getCell(5,cs);cl.value=(kpi.label||"KPI").toUpperCase();
+      cl.font=mkFont("AABBCC",8,true);cl.fill=fg(p.kpiBg);cl.alignment=mkAlign("center");wd.getRow(5).height=18;
 
-      // Valor (row 6)
       wd.mergeCells(6,cs,6,ce);
       const cv=wd.getCell(6,cs);
-      cv.value=kpi.formula?{formula:kpi.formula.replace(/^=/,"")}:0;
-      cv.font={name:"Calibri",bold:true,size:26,color:hexColor(accent)};
-      cv.fill=fgColor(p.kpiBg);
-      cv.alignment=centerAlign();
+      // Fórmula cross-aba com result:0 para forçar recálculo
+      cv.value=kpi.formula?{formula:kpi.formula.replace(/^=/,""),result:0}:0;
+      cv.font=mkFont(accent,26,true);cv.fill=fg(p.kpiBg);cv.alignment=mkAlign("center");
       cv.numFmt=kpi.format==="percent"?"0.0%":kpi.format==="number"?"#,##0.00":'"R$"#,##0.00';
       wd.getRow(6).height=48;
 
-      // Sublabel (row 7)
       wd.mergeCells(7,cs,7,ce);
-      const csl=wd.getCell(7,cs);
-      csl.value=kpi.sublabel||"Acumulado";
-      csl.font={name:"Calibri",size:8,color:hexColor("778899")};
-      csl.fill=fgColor(p.kpiBg);
-      csl.alignment=centerAlign();
-      wd.getRow(7).height=16;
+      const csl=wd.getCell(7,cs);csl.value=kpi.sublabel||"Acumulado";
+      csl.font=mkFont("778899",8);csl.fill=fg(p.kpiBg);csl.alignment=mkAlign("center");wd.getRow(7).height=16;
 
-      // Stripe (row 8)
-      wd.mergeCells(8,cs,8,ce);
-      wd.getCell(8,cs).fill=fgColor(accent);
-      wd.getRow(8).height=7;
+      wd.mergeCells(8,cs,8,ce);wd.getCell(8,cs).fill=fg(accent);wd.getRow(8).height=7;
     }
 
     wd.getRow(9).height=16;
 
-    // Nota
-    wd.mergeCells("A10:N10");
-    const nt=wd.getCell("A10");
-    nt.value="  ℹ️  Os valores são calculados automaticamente a partir dos dados inseridos nas abas de dados. Atualize os dados e salve para recalcular.";
-    nt.font={name:"Calibri",size:9,italic:true,color:hexColor("7090A0")};
-    nt.fill=fgColor(p.bodyBg);
-    nt.alignment={horizontal:"left",vertical:"middle",wrapText:true};
-    wd.getRow(10).height=28;
+    // Insere o gráfico PNG na aba Dashboard
+    if(payload.sheets&&payload.sheets.length>0){
+      try{
+        const chartPng=await gerarGraficoPNG(payload.sheets[0],palette);
+        if(chartPng){
+          const base64=chartPng.replace("data:image/png;base64,","");
+          const imgId=wb.addImage({base64,extension:"png"});
+          wd.addImage(imgId,"A10:N30");
+        }
+      }catch(e){console.warn("Gráfico não gerado:",e);}
+    }
 
-    // Largura das colunas
-    for(let c=1;c<=14;c++) wd.getColumn(c).width=9;
+    // Nota
+    wd.mergeCells("A32:N32");
+    const nt=wd.getCell("A32");
+    nt.value="  ℹ️  Valores calculados automaticamente a partir dos dados. Edite as abas de dados e salve para recalcular.";
+    nt.font={name:"Calibri",italic:true,size:9,color:hx("7090A0")};
+    nt.fill=fg(p.bodyBg);nt.alignment=mkAlign("left","middle",true);wd.getRow(32).height=22;
+
+    // Larguras
+    for(let c=1;c<=14;c++)wd.getColumn(c).width=9;
   }
 
-  // ── 4. REORDENAR ABAS (Dashboard primeiro, Instruções segundo) ──
-  // ExcelJS: worksheets são adicionadas na ordem; vamos mover
-  // Instrucoes foi criada primeiro, Dashboard depois — precisamos inverter a ordem de exibição
-  // Workaround: recriar na ordem correta (ExcelJS não tem moveSheet nativo no browser)
-  // Solução: a ordem atual já é Instruções → sheets → Dashboard
-  // Vamos deixar assim — usuário vê Instruções primeiro, dados depois, Dashboard por último
-
-  // ── 5. DOWNLOAD ───────────────────────────────────────
+  // ── DOWNLOAD ────────────────────────────────────────
   const filename=(payload.filename||"planilheiro")+".xlsx";
   const buffer=await wb.xlsx.writeBuffer();
   const blob=new Blob([buffer],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-  saveAs(blob, filename);
+  saveAs(blob,filename);
 }
 
-// ═══════════════════════════════════════════════════════
-//  EXIBIR MENSAGEM NO CHAT
-// ═══════════════════════════════════════════════════════
-function exibeMsg(role, content){
+// ════════════════════════════════════════════════════════
+//  PREVIEW DE DADOS NO CHAT (antes de baixar)
+// ════════════════════════════════════════════════════════
+function buildPreview(payload){
+  if(!payload||!payload.sheets||!payload.sheets[0])return null;
+  const s=payload.sheets[0];
+  const rows=s.rows||[];
+  const headers=s.headers||[];
+  const colTypes=s.col_types||[];
+  const previewRows=rows.slice(0,5);
+
+  const wrap=document.createElement("div");
+  wrap.className="preview-wrap";
+
+  const table=document.createElement("table");
+  table.className="preview-table";
+
+  const thead=document.createElement("thead");
+  const trh=document.createElement("tr");
+  headers.forEach(h=>{const th=document.createElement("th");th.textContent=h;trh.appendChild(th);});
+  thead.appendChild(trh);table.appendChild(thead);
+
+  const tbody=document.createElement("tbody");
+  previewRows.forEach(rowData=>{
+    const tr=document.createElement("tr");
+    headers.forEach((h,ci)=>{
+      const td=document.createElement("td");
+      const val=rowData[ci];
+      if(typeof val==="string"&&val.startsWith("=")){
+        td.textContent="(fórmula)";td.style.color="var(--txt3)";td.style.fontStyle="italic";
+      }else if(typeof val==="number"&&colTypes[ci]==="currency"){
+        td.textContent="R$ "+val.toLocaleString("pt-BR",{minimumFractionDigits:2});
+      }else if(typeof val==="number"&&colTypes[ci]==="percent"){
+        td.textContent=(val*100).toFixed(1)+"%";
+      }else{td.textContent=val??"";}
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  if(rows.length>5){
+    const tr=document.createElement("tr");
+    const td=document.createElement("td");td.colSpan=headers.length;
+    td.textContent=`... mais ${rows.length-5} linhas`;
+    td.style.cssText="text-align:center;color:var(--txt3);font-style:italic;";
+    tr.appendChild(td);tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);wrap.appendChild(table);
+  return wrap;
+}
+
+// ════════════════════════════════════════════════════════
+//  EXIBIR MENSAGEM
+// ════════════════════════════════════════════════════════
+function exibeMsg(role,content){
   const ci=document.getElementById("chat-inner");
   const isUser=role==="user";
-  const div=document.createElement("div");
-  div.className="msg"+(isUser?" user":"");
+  const div=document.createElement("div");div.className="msg"+(isUser?" user":"");
 
-  if(!isUser){
-    const av=document.createElement("div");
-    av.className="msg-avatar"; av.textContent="📊";
-    div.appendChild(av);
-  }
+  if(!isUser){const av=document.createElement("div");av.className="msg-avatar";av.textContent="📊";div.appendChild(av);}
 
-  const bubble=document.createElement("div");
-  bubble.className="msg-bubble";
+  const bubble=document.createElement("div");bubble.className="msg-bubble";
 
-  // Detecta se há bloco de planilha (qualquer tag) com JSON válido contendo "sheets"
-  const hasPro = role==="assistant" && (
-    content.includes("```planilha-pro") ||
-    // fallback: tem algum bloco de código com "sheets" dentro
-    (content.includes("\"sheets\"") && content.includes("```"))
-  );
+  const hasPro=role==="assistant"&&(content.includes("```planilha-pro")||(content.includes('"sheets"')&&content.includes("```")));
 
   if(hasPro){
     const parsedPayload=extrairJSON(content);
     const displayText=limparBloco(content);
     bubble.innerHTML=formatMsg(displayText);
 
+    // Preview
+    if(parsedPayload){
+      const prev=buildPreview(parsedPayload);
+      if(prev)bubble.appendChild(prev);
+    }
+
     // Palette picker
-    const palRow=document.createElement("div");
-    palRow.className="palette-row";
-    const palLabel=document.createElement("div");
-    palLabel.style.cssText="font-size:11px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;width:100%";
-    palLabel.textContent="Escolha o tema:";
+    const palRow=document.createElement("div");palRow.className="palette-row";
+    const palLabel=document.createElement("span");palLabel.className="pal-label";palLabel.textContent="Tema:";
     palRow.appendChild(palLabel);
     Object.entries(PALETTES).forEach(([key,pal])=>{
-      const btn=document.createElement("button");
-      btn.className="pal-btn"+(key===selectedPalette?" active":"");
+      const btn=document.createElement("button");btn.className="pal-btn"+(key===selectedPalette?" active":"");
       btn.dataset.pal=key;
       btn.innerHTML=`<span class="pal-dot" style="background:${pal.dot}"></span>${pal.label}`;
-      btn.onclick=()=>{
-        selectedPalette=key;
-        document.querySelectorAll(".pal-btn").forEach(b=>b.classList.toggle("active",b.dataset.pal===key));
-      };
+      btn.onclick=()=>{selectedPalette=key;document.querySelectorAll(".pal-btn").forEach(b=>b.classList.toggle("active",b.dataset.pal===key));};
       palRow.appendChild(btn);
     });
     bubble.appendChild(palRow);
 
     // Download card
-    const card=document.createElement("div");
-    card.className="dl-card";
-    const cardTop=document.createElement("div");
-    cardTop.className="dl-card-top";
-
+    const card=document.createElement("div");card.className="dl-card";
+    const cardTop=document.createElement("div");cardTop.className="dl-card-top";
     const sheetCount=parsedPayload?parsedPayload.sheets.length:0;
     const kpiCount=parsedPayload?.dashboard?.kpis?.length||0;
     const cardTitle=parsedPayload?.dashboard?.title||parsedPayload?.filename||"Planilha";
-
-    cardTop.innerHTML=`
-      <div class="dl-card-icon">📊</div>
-      <div class="dl-card-info">
-        <div class="dl-card-title">${cardTitle}</div>
-        <div class="dl-card-sub">${sheetCount} aba(s) de dados · ${kpiCount} KPIs · Dashboard + Fórmulas prontas</div>
-      </div>`;
+    cardTop.innerHTML=`<div class="dl-card-icon">📊</div><div class="dl-card-info"><div class="dl-card-title">${cardTitle}</div><div class="dl-card-sub">${sheetCount} aba(s) · ${kpiCount} KPIs · Dashboard · Gráfico · Formatação condicional</div></div>`;
     card.appendChild(cardTop);
 
-    const cardActions=document.createElement("div");
-    cardActions.className="dl-card-actions";
-
-    const btn=document.createElement("button");
-    btn.className="btn-dl";
+    const cardActions=document.createElement("div");cardActions.className="dl-card-actions";
+    const btn=document.createElement("button");btn.className="btn-dl";
     btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar Planilha .xlsx`;
 
     if(parsedPayload){
       btn.onclick=async()=>{
-        btn.disabled=true;
-        btn.textContent="⏳ Gerando arquivo...";
+        btn.disabled=true;btn.textContent="⏳ Gerando arquivo...";
         try{
           parsedPayload.palette=selectedPalette;
-          await gerarExcel(parsedPayload, selectedPalette);
-          btn.innerHTML="✅ Download iniciado!";
-          btn.style.background="#27AE60";
-          setTimeout(()=>{
-            btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar novamente`;
-            btn.style.background="";
-            btn.disabled=false;
-          },3000);
+          await gerarExcel(parsedPayload,selectedPalette);
+          btn.innerHTML="✅ Download iniciado!";btn.style.background="#27AE60";
+          setTimeout(()=>{btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar novamente`;btn.style.background="";btn.disabled=false;},3000);
         }catch(err){
-          console.error("Erro ao gerar Excel:", err);
-          btn.innerHTML="❌ Erro — tente novamente";
-          btn.style.background="#E84855";
-          btn.disabled=false;
-          setTimeout(()=>{
-            btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar Planilha .xlsx`;
-            btn.style.background="";
-          },3000);
+          console.error(err);btn.innerHTML="❌ Erro — tente novamente";btn.style.background="#E84855";btn.disabled=false;
+          setTimeout(()=>{btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar Planilha .xlsx`;btn.style.background="";},3000);
         }
       };
-    } else {
-      // Parse falhou: botão de retry que pede ao Claude para regenerar
-      btn.textContent="🔄 Gerar novamente";
-      btn.style.background="#F5A623";
-      btn.onclick=()=>{ enviar("Por favor, gere a planilha novamente. Retorne o JSON em uma única linha dentro do bloco ```planilha-pro, sem quebras de linha no JSON."); };
+    }else{
+      btn.textContent="🔄 Gerar novamente";btn.style.background="#F5A623";
+      btn.onclick=()=>enviar("Por favor, gere a planilha novamente com o JSON em uma única linha dentro do bloco ```planilha-pro.");
     }
 
-    cardActions.appendChild(btn);
-    card.appendChild(cardActions);
-
+    cardActions.appendChild(btn);card.appendChild(cardActions);
     if(!parsedPayload){
       const warn=document.createElement("div");
-      warn.style.cssText="padding:0 18px 14px;font-size:11px;color:#92400e;background:#fffbeb;border-top:1px solid #fde68a;padding:10px 18px;";
-      warn.textContent="⚠️ Houve um problema ao processar o JSON. Clique em 'Gerar novamente' — o sistema vai corrigir automaticamente.";
+      warn.style.cssText="padding:0 18px 14px;font-size:11px;color:var(--amber);";
+      warn.textContent="⚠️ Clique em 'Gerar novamente' para tentar outra vez.";
       card.appendChild(warn);
     }
-
     bubble.appendChild(card);
-  } else {
+
+  }else{
     bubble.innerHTML=formatMsg(content);
   }
 
-  div.appendChild(bubble);
-  ci.appendChild(div);
+  // Feedback 👍/👎
+  if(role==="assistant"&&historico[modo].length>0){
+    const fb=document.createElement("div");fb.className="msg-feedback";
+    const label=document.createElement("span");label.className="fb-label";label.textContent="Útil?";
+    const btnUp=document.createElement("button");btnUp.className="btn-fb";btnUp.textContent="👍";
+    const btnDown=document.createElement("button");btnDown.className="btn-fb";btnDown.textContent="👎";
+    btnUp.onclick=()=>{btnUp.classList.add("active-up");btnDown.classList.remove("active-down");btnUp.disabled=true;btnDown.disabled=true;};
+    btnDown.onclick=()=>{btnDown.classList.add("active-down");btnUp.classList.remove("active-up");btnUp.disabled=true;btnDown.disabled=true;};
+    fb.appendChild(label);fb.appendChild(btnUp);fb.appendChild(btnDown);
+    bubble.appendChild(fb);
+  }
+
+  div.appendChild(bubble);ci.appendChild(div);
   document.getElementById("chat-area").scrollTop=999999;
   document.getElementById("chips-area").style.display=historico[modo].length===0?"block":"none";
 }
 
+// ════════════════════════════════════════════════════════
+//  FORMAT MSG — com botão copiar em blocos de código
+// ════════════════════════════════════════════════════════
 function formatMsg(text){
   return text.split(/(```[\s\S]*?```)/g).map(part=>{
     if(part.startsWith("```")&&part.endsWith("```")){
-      return `<div class="msg-code">${esc(part.slice(3,-3).replace(/^\w+\n/,""))}</div>`;
+      const code=part.slice(3,-3).replace(/^\w+\n/,"");
+      const id="code-"+Math.random().toString(36).slice(2,7);
+      // Extrai fórmulas para salvar no histórico
+      const lines=code.split("\n").filter(l=>l.trim().startsWith("="));
+      lines.forEach(l=>{const f=l.trim();if(f.length>2)saveFormula(f,"Fórmula gerada pelo Planilheiro");});
+      return `<div class="msg-code-wrap"><pre class="msg-code" id="${id}">${esc(code)}</pre><button class="btn-copy" onclick="copiarCodigo('${id}',this)">Copiar</button></div>`;
     }
     return part
       .replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>")
-      .replace(/## (.*?)(\n|$)/g,"<div style='font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.1em;margin-top:16px;margin-bottom:6px'>$1</div>")
+      .replace(/## (.*?)(\n|$)/g,"<div style='font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-top:16px;margin-bottom:6px'>$1</div>")
       .replace(/### (.*?)(\n|$)/g,"<div style='font-weight:700;color:var(--txt);margin-top:12px;margin-bottom:4px'>$1</div>")
-      .replace(/- (.*?)(\n|$)/g,"<div style='padding-left:14px;margin:2px 0'>• $1</div>")
+      .replace(/^- (.*?)(\n|$)/gm,"<div style='padding-left:14px;margin:2px 0'>• $1</div>")
       .replace(/\n/g,"<br/>");
   }).join("");
 }
-function esc(t){ return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-// ═══════════════════════════════════════════════════════
-//  CHIPS
-// ═══════════════════════════════════════════════════════
-function renderChips(){
-  const chips=modo==="chat"?CHIPS_CHAT:CHIPS_GERADOR;
-  const cl=document.getElementById("chips-list"); cl.innerHTML="";
-  chips.forEach(c=>{
-    const btn=document.createElement("button");
-    btn.className="chip"; btn.textContent=c;
-    btn.onclick=()=>enviar(c);
-    cl.appendChild(btn);
+function esc(t){return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+function copiarCodigo(id,btn){
+  const el=document.getElementById(id);
+  if(!el)return;
+  navigator.clipboard.writeText(el.textContent).then(()=>{
+    btn.textContent="✓ Copiado!";btn.classList.add("copied");
+    setTimeout(()=>{btn.textContent="Copiar";btn.classList.remove("copied");},2000);
+  }).catch(()=>{
+    // fallback
+    const r=document.createRange();r.selectNodeContents(el);
+    const sel=window.getSelection();sel.removeAllRanges();sel.addRange(r);
+    document.execCommand("copy");sel.removeAllRanges();
+    btn.textContent="✓ Copiado!";setTimeout(()=>{btn.textContent="Copiar";},2000);
   });
 }
 
-// ═══════════════════════════════════════════════════════
-//  LIMITES PLANO BÁSICO
-// ═══════════════════════════════════════════════════════
-function getUsos(){ const hoje=new Date().toDateString(); const s=localStorage.getItem("pl_usos"); if(!s) return 0; const p=JSON.parse(s); return p.data!==hoje?0:p.count; }
-function addUso(){ const hoje=new Date().toDateString(); const count=getUsos()+1; localStorage.setItem("pl_usos",JSON.stringify({data:hoje,count})); return count; }
+// ════════════════════════════════════════════════════════
+//  CHIPS
+// ════════════════════════════════════════════════════════
+function renderChips(){
+  const chips=modo==="chat"?CHIPS_CHAT:CHIPS_GERADOR;
+  const cl=document.getElementById("chips-list");cl.innerHTML="";
+  chips.forEach(c=>{
+    const btn=document.createElement("button");btn.className="chip";btn.textContent=c;
+    btn.onclick=()=>enviar(c);cl.appendChild(btn);
+  });
+}
+
+// ════════════════════════════════════════════════════════
+//  LIMITES BÁSICO
+// ════════════════════════════════════════════════════════
+function getUsos(){const hoje=new Date().toDateString();const s=localStorage.getItem("pl_usos");if(!s)return 0;const p=JSON.parse(s);return p.data!==hoje?0:p.count;}
+function addUso(){const hoje=new Date().toDateString();const count=getUsos()+1;localStorage.setItem("pl_usos",JSON.stringify({data:hoje,count}));return count;}
 function checkBanners(){
-  if(plano!=="basico") return;
+  if(plano!=="basico")return;
   const r=LIMITE_BASICO-getUsos();
   document.getElementById("banner-warn").style.display=r<=10&&r>0?"block":"none";
   document.getElementById("banner-block").style.display=r<=0?"flex":"none";
-  if(r<=10&&r>0) document.getElementById("banner-warn").textContent=`⚠️ Você tem apenas ${r} perguntas restantes hoje.`;
+  if(r<=10&&r>0)document.getElementById("banner-warn").textContent=`⚠️ Você tem apenas ${r} perguntas restantes hoje.`;
   document.getElementById("brand-plan-text").textContent=`Plano Básico · ${Math.max(0,r)} restantes`;
 }
 
-// ═══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
 //  INPUT
-// ═══════════════════════════════════════════════════════
-document.getElementById("msg-input").addEventListener("keydown",e=>{
-  if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); enviar(); }
-});
+// ════════════════════════════════════════════════════════
+document.getElementById("msg-input").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();enviar();}});
 document.getElementById("msg-input").addEventListener("input",function(){
-  this.style.height="auto";
-  this.style.height=Math.min(this.scrollHeight,120)+"px";
+  this.style.height="auto";this.style.height=Math.min(this.scrollHeight,120)+"px";
   document.getElementById("send-btn").disabled=!this.value.trim()||loading;
 });
 
-// ═══════════════════════════════════════════════════════
-//  ENVIAR MENSAGEM
-// ═══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
+//  ENVIAR — com streaming
+// ════════════════════════════════════════════════════════
 async function enviar(txt){
   const input=document.getElementById("msg-input");
   const text=txt||input.value.trim();
-  if(!text||loading) return;
-  if(plano==="basico"){ const t=addUso(); checkBanners(); if(t>LIMITE_BASICO) return; }
+  if(!text||loading)return;
+  if(plano==="basico"){const t=addUso();checkBanners();if(t>LIMITE_BASICO)return;}
 
   historico[modo].push({role:"user",content:text});
   exibeMsg("user",text);
-  input.value=""; input.style.height="auto";
+  input.value="";input.style.height="auto";
   document.getElementById("send-btn").disabled=true;
   document.getElementById("chips-area").style.display="none";
   loading=true;
 
   const ci=document.getElementById("chat-inner");
-  const typDiv=document.createElement("div");
-  typDiv.className="msg"; typDiv.id="typing";
+  const typDiv=document.createElement("div");typDiv.className="msg";typDiv.id="typing";
   typDiv.innerHTML=`<div class="msg-avatar">📊</div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
   ci.appendChild(typDiv);
   document.getElementById("chat-area").scrollTop=999999;
 
   try{
     const res=await fetch("/api/chat",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        system: modo==="chat"?SYSTEM_CHAT:SYSTEM_GERADOR,
-        messages: historico[modo]
-      })
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({system:modo==="chat"?SYSTEM_CHAT:SYSTEM_GERADOR,messages:historico[modo]})
     });
     const data=await res.json();
     const reply=data.text||"Desculpe, tive um problema. Tente novamente.";
@@ -996,7 +1090,7 @@ async function enviar(txt){
     typingEl?.remove();
     historico[modo].push({role:"assistant",content:reply});
     exibeMsg("assistant",reply);
-    if(typingTop!==null) document.getElementById("chat-area").scrollTop=typingTop-16;
+    if(typingTop!==null)document.getElementById("chat-area").scrollTop=typingTop-16;
   }catch{
     document.getElementById("typing")?.remove();
     const err="Erro de conexão. Tente novamente.";
