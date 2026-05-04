@@ -5,415 +5,130 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>O Planilheiro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<!-- ExcelJS: suporta estilos completos no browser (MIT License) -->
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
+<!-- FileSaver para download do arquivo -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 <style>
 :root {
-  --bg: #ffffff;
-  --surface: #f7f8f7;
-  --surface2: #f0f4f0;
-  --border: #e8ede8;
-  --border2: #d4ddd4;
-  --txt: #0d1a0d;
-  --txt2: #4a6350;
-  --txt3: #8fa693;
-  --green: #1a7a3c;
-  --green2: #22a050;
-  --green3: #2ec863;
-  --green-light: #e8f5ec;
-  --green-light2: #d0edda;
-  --user-bubble: #1a7a3c;
-  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
-  --shadow2: 0 2px 8px rgba(26,122,60,0.12);
+  --bg:#ffffff; --surface:#f7f8f7; --surface2:#f0f4f0;
+  --border:#e8ede8; --border2:#d4ddd4;
+  --txt:#0d1a0d; --txt2:#4a6350; --txt3:#8fa693;
+  --green:#1a7a3c; --green2:#22a050; --green3:#2ec863;
+  --green-light:#e8f5ec; --green-light2:#d0edda;
+  --shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 16px rgba(0,0,0,0.04);
+  --shadow2:0 2px 8px rgba(26,122,60,0.12);
 }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;font-size:15px;line-height:1.6}
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:var(--surface);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}
+.login-card{width:100%;max-width:420px;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:48px 40px;box-shadow:var(--shadow);animation:fadeUp .4s ease both}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px}
+.login-logo-icon{width:44px;height:44px;background:var(--green);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:var(--shadow2)}
+.login-logo-name{font-size:20px;font-weight:800;color:var(--txt);letter-spacing:-.5px}
+.login-logo-name span{color:var(--green2)}
+.login-heading{font-size:26px;font-weight:800;color:var(--txt);letter-spacing:-.5px;margin-bottom:6px}
+.login-sub{font-size:14px;color:var(--txt3);margin-bottom:32px}
+.field-label{font-size:12px;font-weight:600;color:var(--txt2);margin-bottom:8px;display:block;letter-spacing:.02em}
+.pass-wrap{position:relative;margin-bottom:12px}
+.pass-wrap input{width:100%;background:var(--surface);border:1.5px solid var(--border2);border-radius:10px;padding:13px 44px 13px 14px;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:14px;outline:none;transition:all .2s}
+.pass-wrap input:focus{border-color:var(--green2);background:var(--bg);box-shadow:0 0 0 3px rgba(34,160,80,.1)}
+.pass-wrap input::placeholder{color:var(--txt3);font-family:'Plus Jakarta Sans',sans-serif}
+.show-pass{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--txt3);font-size:16px;padding:0}
+.error-msg{font-size:12px;color:#dc2626;font-weight:500;margin-bottom:12px;display:none;background:#fef2f2;border:1px solid #fecaca;padding:8px 12px;border-radius:8px}
+.btn-login{width:100%;padding:13px;background:var(--green);color:white;border:none;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:all .2s;margin-top:8px;box-shadow:var(--shadow2)}
+.btn-login:hover{background:var(--green2);transform:translateY(-1px)}
+.login-footer{margin-top:28px;padding-top:20px;border-top:1px solid var(--border);font-size:13px;color:var(--txt3);text-align:center}
+.login-footer a{color:var(--green);font-weight:600;text-decoration:none}
 
-body {
-  background: var(--bg);
-  color: var(--txt);
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  font-size: 15px;
-  line-height: 1.6;
-}
-
-/* ── LOGIN ─────────────────────────────────── */
-#login-screen {
-  position: fixed; inset: 0;
-  background: var(--surface);
-  display: flex; align-items: center; justify-content: center;
-  padding: 20px; z-index: 100;
-}
-
-.login-card {
-  width: 100%; max-width: 420px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 48px 40px;
-  box-shadow: var(--shadow);
-  animation: fadeUp 0.4s ease both;
-}
-
-.login-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 32px;
-}
-
-.login-logo-icon {
-  width: 44px; height: 44px;
-  background: var(--green);
-  border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px;
-  box-shadow: var(--shadow2);
-}
-
-.login-logo-name {
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--txt);
-  letter-spacing: -0.5px;
-}
-
-.login-logo-name span { color: var(--green2); }
-
-.login-heading {
-  font-size: 26px;
-  font-weight: 800;
-  color: var(--txt);
-  letter-spacing: -0.5px;
-  margin-bottom: 6px;
-}
-
-.login-sub {
-  font-size: 14px;
-  color: var(--txt3);
-  margin-bottom: 32px;
-  font-weight: 400;
-}
-
-.field-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--txt2);
-  margin-bottom: 8px;
-  display: block;
-  letter-spacing: 0.02em;
-}
-
-.pass-wrap { position: relative; margin-bottom: 12px; }
-
-.pass-wrap input {
-  width: 100%;
-  background: var(--surface);
-  border: 1.5px solid var(--border2);
-  border-radius: 10px;
-  padding: 13px 44px 13px 14px;
-  color: var(--txt);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
-  outline: none;
-  transition: all 0.2s;
-}
-.pass-wrap input:focus {
-  border-color: var(--green2);
-  background: var(--bg);
-  box-shadow: 0 0 0 3px rgba(34,160,80,0.1);
-}
-.pass-wrap input::placeholder { color: var(--txt3); font-family: 'Plus Jakarta Sans', sans-serif; }
-
-.show-pass {
-  position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
-  background: none; border: none; cursor: pointer; color: var(--txt3); font-size: 16px; padding: 0;
-}
-
-.error-msg {
-  font-size: 12px; color: #dc2626; font-weight: 500;
-  margin-bottom: 12px; display: none;
-  background: #fef2f2; border: 1px solid #fecaca;
-  padding: 8px 12px; border-radius: 8px;
-}
-
-.btn-login {
-  width: 100%; padding: 13px;
-  background: var(--green);
-  color: white; border: none; border-radius: 10px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-weight: 700; font-size: 15px; cursor: pointer;
-  transition: all 0.2s; margin-top: 8px;
-  box-shadow: var(--shadow2);
-}
-.btn-login:hover { background: var(--green2); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(26,122,60,0.2); }
-
-.login-footer {
-  margin-top: 28px; padding-top: 20px;
-  border-top: 1px solid var(--border);
-  font-size: 13px; color: var(--txt3); text-align: center;
-}
-.login-footer a { color: var(--green); font-weight: 600; text-decoration: none; }
-.login-footer a:hover { text-decoration: underline; }
-
-/* ── APP ───────────────────────────────────── */
-#app-screen {
-  display: none;
-  flex-direction: column;
-  height: 100vh;
-}
-
-/* HEADER */
-.header {
-  height: 60px; padding: 0 24px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-  background: var(--bg);
-  flex-shrink: 0;
-}
-
-.brand { display: flex; align-items: center; gap: 10px; }
-
-.brand-icon {
-  width: 34px; height: 34px;
-  background: var(--green);
-  border-radius: 9px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 17px;
-}
-
-.brand-name { font-size: 16px; font-weight: 800; color: var(--txt); letter-spacing: -0.3px; }
-.brand-name span { color: var(--green2); }
-
-.brand-sep { width: 1px; height: 18px; background: var(--border2); margin: 0 4px; }
-
-.brand-plan-text {
-  font-size: 12px; font-weight: 500; color: var(--txt3);
-}
-
-.header-right { display: flex; align-items: center; gap: 8px; }
-
-.plan-badge {
-  font-size: 11px; font-weight: 700;
-  color: var(--green); background: var(--green-light);
-  border: 1px solid var(--green-light2);
-  padding: 4px 10px; border-radius: 100px;
-  letter-spacing: 0.02em;
-}
-
-.btn-upgrade {
-  font-size: 12px; font-weight: 700;
-  color: white; background: var(--green);
-  border: none; padding: 6px 14px; border-radius: 100px;
-  cursor: pointer; text-decoration: none; transition: all 0.2s;
-  display: none;
-}
-.btn-upgrade:hover { background: var(--green2); }
-
-.btn-sair {
-  font-size: 12px; font-weight: 500; color: var(--txt3);
-  background: var(--surface); border: 1px solid var(--border2);
-  padding: 6px 14px; border-radius: 100px; cursor: pointer; transition: all 0.2s;
-}
-.btn-sair:hover { color: var(--txt2); border-color: var(--border); }
+/* APP */
+#app-screen{display:none;flex-direction:column;height:100vh}
+.header{height:60px;padding:0 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg);flex-shrink:0}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-icon{width:34px;height:34px;background:var(--green);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.brand-name{font-size:16px;font-weight:800;color:var(--txt);letter-spacing:-.3px}
+.brand-name span{color:var(--green2)}
+.brand-sep{width:1px;height:18px;background:var(--border2);margin:0 4px}
+.brand-plan-text{font-size:12px;font-weight:500;color:var(--txt3)}
+.header-right{display:flex;align-items:center;gap:8px}
+.plan-badge{font-size:11px;font-weight:700;color:var(--green);background:var(--green-light);border:1px solid var(--green-light2);padding:4px 10px;border-radius:100px;letter-spacing:.02em}
+.btn-upgrade{font-size:12px;font-weight:700;color:white;background:var(--green);border:none;padding:6px 14px;border-radius:100px;cursor:pointer;text-decoration:none;transition:all .2s;display:none}
+.btn-upgrade:hover{background:var(--green2)}
+.btn-sair{font-size:12px;font-weight:500;color:var(--txt3);background:var(--surface);border:1px solid var(--border2);padding:6px 14px;border-radius:100px;cursor:pointer;transition:all .2s}
+.btn-sair:hover{color:var(--txt2)}
 
 /* TABS */
-.tabs {
-  padding: 10px 24px;
-  border-bottom: 1px solid var(--border);
-  display: flex; gap: 4px; flex-shrink: 0;
-  background: var(--bg);
-}
+.tabs{padding:10px 24px;border-bottom:1px solid var(--border);display:flex;gap:4px;flex-shrink:0;background:var(--bg)}
+.tab{font-size:13px;font-weight:600;color:var(--txt3);background:none;border:none;padding:7px 16px;border-radius:8px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;font-family:'Plus Jakarta Sans',sans-serif}
+.tab:hover{color:var(--txt2);background:var(--surface)}
+.tab.active{color:var(--green);background:var(--green-light)}
+.tab:disabled{opacity:.4;cursor:not-allowed}
+.tab-pro-badge{font-size:9px;font-weight:700;color:var(--green);background:var(--green-light2);padding:2px 6px;border-radius:4px;letter-spacing:.05em}
 
-.tab {
-  font-size: 13px; font-weight: 600;
-  color: var(--txt3); background: none; border: none;
-  padding: 7px 16px; border-radius: 8px; cursor: pointer;
-  transition: all 0.15s; display: flex; align-items: center; gap: 6px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-}
-.tab:hover { color: var(--txt2); background: var(--surface); }
-.tab.active { color: var(--green); background: var(--green-light); }
-.tab:disabled { opacity: 0.4; cursor: not-allowed; }
-
-.tab-pro-badge {
-  font-size: 9px; font-weight: 700;
-  color: var(--green); background: var(--green-light2);
-  padding: 2px 6px; border-radius: 4px; letter-spacing: 0.05em;
-}
-
-/* INFO BAR */
-.info-bar {
-  padding: 8px 24px;
-  background: var(--green-light);
-  border-bottom: 1px solid var(--green-light2);
-  font-size: 12px; color: var(--green);
-  font-weight: 500; display: none;
-}
-
-/* BANNERS */
-.banner {
-  margin: 10px 24px 0;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 500;
-}
-.banner-warn {
-  background: #fffbeb;
-  border: 1px solid #fde68a;
-  color: #92400e;
-  display: none;
-}
-.banner-block {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #991b1b;
-  display: none;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
+.info-bar{padding:8px 24px;background:var(--green-light);border-bottom:1px solid var(--green-light2);font-size:12px;color:var(--green);font-weight:500;display:none}
+.banner{margin:10px 24px 0;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:500}
+.banner-warn{background:#fffbeb;border:1px solid #fde68a;color:#92400e;display:none}
+.banner-block{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;display:none;align-items:center;justify-content:space-between;gap:12px}
 
 /* CHAT */
-.chat-area {
-  flex: 1; overflow-y: auto;
-  padding: 28px 24px;
-  background: var(--bg);
-}
+.chat-area{flex:1;overflow-y:auto;padding:28px 24px;background:var(--bg)}
+.chat-inner{max-width:700px;margin:0 auto}
+.msg{display:flex;margin-bottom:20px;animation:fadeUp .2s ease}
+.msg.user{justify-content:flex-end}
+.msg-avatar{width:32px;height:32px;background:var(--green-light);border:1.5px solid var(--green-light2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;margin-right:10px;flex-shrink:0;margin-top:2px}
+.msg-bubble{max-width:75%;font-size:14px;line-height:1.75;color:var(--txt)}
+.msg.user .msg-bubble{background:var(--green);color:white;border-radius:16px 16px 4px 16px;padding:12px 16px;box-shadow:var(--shadow2)}
+.msg-code{background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--green);margin:10px 0;overflow-x:auto;line-height:1.7;white-space:pre-wrap}
+.typing{display:flex;align-items:center;gap:4px;padding:12px 0}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--green-light2);animation:bounce 1.4s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
 
-.chat-inner { max-width: 700px; margin: 0 auto; }
+/* DOWNLOAD CARD */
+.dl-card{margin-top:16px;background:linear-gradient(135deg,#eafaf0,#d5f0e0);border:1.5px solid var(--green-light2);border-radius:14px;overflow:hidden}
+.dl-card-top{padding:14px 18px;display:flex;align-items:center;gap:12px}
+.dl-card-icon{font-size:26px;flex-shrink:0}
+.dl-card-info{flex:1;min-width:0}
+.dl-card-title{font-size:13px;font-weight:700;color:var(--green);margin-bottom:2px}
+.dl-card-sub{font-size:11px;color:var(--txt3)}
+.dl-card-actions{padding:0 18px 14px;display:flex;gap:8px;flex-wrap:wrap}
+.btn-dl{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;background:var(--green);color:white;border:none;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(26,122,60,.2)}
+.btn-dl:hover{background:var(--green2);transform:translateY(-1px)}
+.btn-dl:disabled{background:var(--border2);color:var(--txt3);cursor:not-allowed;transform:none;box-shadow:none}
+.btn-dl.secondary{background:white;color:var(--green);border:1.5px solid var(--green-light2)}
+.btn-dl.secondary:hover{background:var(--green-light)}
 
-.msg { display: flex; margin-bottom: 20px; animation: fadeUp 0.2s ease; }
-.msg.user { justify-content: flex-end; }
-
-.msg-avatar {
-  width: 32px; height: 32px;
-  background: var(--green-light);
-  border: 1.5px solid var(--green-light2);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; margin-right: 10px; flex-shrink: 0; margin-top: 2px;
-}
-
-.msg-bubble {
-  max-width: 75%;
-  font-size: 14px; line-height: 1.75; color: var(--txt);
-}
-
-.msg.user .msg-bubble {
-  background: var(--green);
-  color: white;
-  border-radius: 16px 16px 4px 16px;
-  padding: 12px 16px;
-  box-shadow: var(--shadow2);
-}
-
-.msg-code {
-  background: var(--surface);
-  border: 1px solid var(--border2);
-  border-radius: 8px;
-  padding: 12px 16px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12.5px; color: var(--green);
-  margin: 10px 0; overflow-x: auto; line-height: 1.7; white-space: pre-wrap;
-}
-
-.typing { display: flex; align-items: center; gap: 4px; padding: 12px 0; }
-.typing span {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--green-light2); animation: bounce 1.4s infinite;
-}
-.typing span:nth-child(2) { animation-delay: 0.2s; }
-.typing span:nth-child(3) { animation-delay: 0.4s; }
+/* PALETTE PILLS */
+.palette-row{display:flex;gap:6px;margin:12px 0 2px;flex-wrap:wrap}
+.pal-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:100px;border:1.5px solid var(--border2);background:white;font-size:11px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:var(--txt2);transition:all .15s}
+.pal-btn:hover,.pal-btn.active{border-color:var(--green2);background:var(--green-light);color:var(--green)}
+.pal-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
 
 /* CHIPS */
-.chips-area {
-  padding: 0 24px 14px;
-  max-width: 700px; margin: 0 auto; width: 100%;
-}
-.chips-label {
-  font-size: 11px; font-weight: 600; color: var(--txt3);
-  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
-}
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip {
-  font-size: 12px; font-weight: 500;
-  color: var(--txt2); background: var(--surface);
-  border: 1px solid var(--border2);
-  padding: 6px 12px; border-radius: 100px; cursor: pointer; transition: all 0.15s;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-}
-.chip:hover { color: var(--green); background: var(--green-light); border-color: var(--green-light2); }
+.chips-area{padding:0 24px 14px;max-width:700px;margin:0 auto;width:100%}
+.chips-label{font-size:11px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;font-weight:500;color:var(--txt2);background:var(--surface);border:1px solid var(--border2);padding:6px 12px;border-radius:100px;cursor:pointer;transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif}
+.chip:hover{color:var(--green);background:var(--green-light);border-color:var(--green-light2)}
 
 /* INPUT */
-.input-area {
-  padding: 14px 24px 20px;
-  border-top: 1px solid var(--border);
-  background: var(--bg); flex-shrink: 0;
-}
-
-.input-inner { max-width: 700px; margin: 0 auto; }
-
-.input-box {
-  background: var(--surface);
-  border: 1.5px solid var(--border2);
-  border-radius: 12px;
-  padding: 12px 48px 12px 16px;
-  display: flex; align-items: flex-end;
-  position: relative; transition: all 0.2s;
-}
-.input-box:focus-within {
-  border-color: var(--green2);
-  background: var(--bg);
-  box-shadow: 0 0 0 3px rgba(34,160,80,0.08);
-}
-
-#msg-input {
-  flex: 1; background: transparent; border: none; outline: none;
-  color: var(--txt); font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 14px; line-height: 1.6; resize: none; max-height: 120px;
-}
-#msg-input::placeholder { color: var(--txt3); }
-
-.send-btn {
-  position: absolute; right: 10px; bottom: 10px;
-  width: 34px; height: 34px; border-radius: 8px; border: none;
-  background: var(--green); color: white; font-size: 16px;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s; flex-shrink: 0;
-}
-.send-btn:disabled { background: var(--border2); color: var(--txt3); cursor: not-allowed; }
-.send-btn:not(:disabled):hover { background: var(--green2); transform: scale(1.05); }
-
-.input-footer {
-  margin-top: 8px; font-size: 11px; color: var(--txt3);
-  text-align: center; font-weight: 400;
-}
-
-::-webkit-scrollbar { width: 4px; }
-.btn-download {
-  display: inline-flex; align-items: center; gap: 8px;
-  margin-top: 14px;
-  padding: 11px 20px;
-  background: var(--green);
-  color: white; border: none; border-radius: 10px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 14px; font-weight: 700; cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 2px 8px rgba(26,122,60,0.2);
-}
-.btn-download:hover { background: var(--green2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(26,122,60,0.3); }
-.btn-download svg { flex-shrink: 0; }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
-
-@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-@keyframes bounce { 0%,60%,100% { transform:translateY(0); } 30% { transform:translateY(-5px); } }
-@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+.input-area{padding:14px 24px 20px;border-top:1px solid var(--border);background:var(--bg);flex-shrink:0}
+.input-inner{max-width:700px;margin:0 auto}
+.input-box{background:var(--surface);border:1.5px solid var(--border2);border-radius:12px;padding:12px 48px 12px 16px;display:flex;align-items:flex-end;position:relative;transition:all .2s}
+.input-box:focus-within{border-color:var(--green2);background:var(--bg);box-shadow:0 0 0 3px rgba(34,160,80,.08)}
+#msg-input{flex:1;background:transparent;border:none;outline:none;color:var(--txt);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;line-height:1.6;resize:none;max-height:120px}
+#msg-input::placeholder{color:var(--txt3)}
+.send-btn{position:absolute;right:10px;bottom:10px;width:34px;height:34px;border-radius:8px;border:none;background:var(--green);color:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.send-btn:disabled{background:var(--border2);color:var(--txt3);cursor:not-allowed}
+.send-btn:not(:disabled):hover{background:var(--green2);transform:scale(1.05)}
+.input-footer{margin-top:8px;font-size:11px;color:var(--txt3);text-align:center}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
 </style>
 </head>
 <body>
@@ -457,9 +172,7 @@ body {
   </div>
 
   <div class="tabs">
-    <button class="tab active" id="tab-chat" onclick="setMode('chat')">
-      💬 Fórmulas & Erros
-    </button>
+    <button class="tab active" id="tab-chat" onclick="setMode('chat')">💬 Fórmulas & Erros</button>
     <button class="tab" id="tab-gerador" onclick="setMode('gerador')">
       ⚡ Gerar Planilha
       <span class="tab-pro-badge" id="tab-pro" style="display:none">PRO</span>
@@ -467,9 +180,8 @@ body {
   </div>
 
   <div class="info-bar" id="info-bar">
-    ⚡ Modo Gerador — descreva seus dados e objetivo. Farei as perguntas certas para montar algo personalizado.
+    ⚡ Modo Pro — descreva sua planilha e vou gerar um arquivo Excel profissional com dashboard, gráficos e fórmulas prontos.
   </div>
-
   <div class="banner banner-warn" id="banner-warn"></div>
   <div class="banner banner-block" id="banner-block">
     <span>🚫 Limite diário atingido. Renova amanhã ou faça upgrade.</span>
@@ -497,16 +209,50 @@ body {
 </div>
 
 <script>
-const SENHAS_BASICO = ["BASICO2025","PLAN123","EXCEL001"];
-const SENHAS_PRO    = ["PRO2025","PLANPRO1","POWERBI01"];
-const LIMITE_BASICO = 50;
+// ═══════════════════════════════════════════════════════
+//  CONFIGURAÇÃO — edite aqui
+// ═══════════════════════════════════════════════════════
+const SENHAS_BASICO  = ["BASICO2025","PLAN123","EXCEL001"];
+const SENHAS_PRO     = ["PRO2025","PLANPRO1","POWERBI01"];
+const LIMITE_BASICO  = 50;
 
+const CHIPS_CHAT = [
+  "Como usar PROCV com duas condições?",
+  "Meu SE aninhado não funciona",
+  "Diferença entre ÍNDICE+CORRESP e PROCX",
+  "SOMASES com múltiplos critérios",
+  "Fórmula para calcular variação %",
+  "Como travar referência de célula?"
+];
+const CHIPS_GERADOR = [
+  "Controle financeiro pessoal",
+  "Controle de estoque com alertas",
+  "Dashboard de vendas mensal",
+  "Fluxo de caixa empresarial",
+  "Gestão de projetos com prazos",
+  "Controle de metas vs resultado"
+];
+
+// ═══════════════════════════════════════════════════════
+//  PALETAS DE CORES (usadas no Excel gerado)
+// ═══════════════════════════════════════════════════════
+const PALETTES = {
+  ocean:     { label:"Oceano",     dot:"#00BFA5", hdrBg:"1A3550", hdrFg:"FFFFFF", acc1:"00BFA5", acc2:"F5A623", acc3:"E84855", kpiBg:"1E3D5C", altRow:"EBF4FA", bodyBg:"F7FAFC", border:"C8D8E8" },
+  forest:    { label:"Floresta",   dot:"#2EC863", hdrBg:"1B3A2D", hdrFg:"FFFFFF", acc1:"2EC863", acc2:"F5A623", acc3:"E84855", kpiBg:"1F4435", altRow:"EAF6EE", bodyBg:"F7FBF8", border:"C4DDD0" },
+  midnight:  { label:"Meia-noite", dot:"#6C63FF", hdrBg:"1A1A2E", hdrFg:"E0E0FF", acc1:"6C63FF", acc2:"F5A623", acc3:"FF6584", kpiBg:"16213E", altRow:"F0F0FF", bodyBg:"F8F8FF", border:"C8C8E8" },
+  corporate: { label:"Corporativo",dot:"#2E75B6", hdrBg:"1F3864", hdrFg:"FFFFFF", acc1:"2E75B6", acc2:"ED7D31", acc3:"FF0000", kpiBg:"263F75", altRow:"DEEAF1", bodyBg:"F8FAFD", border:"BDD7EE" },
+};
+let selectedPalette = "ocean";
+
+// ═══════════════════════════════════════════════════════
+//  SYSTEM PROMPTS
+// ═══════════════════════════════════════════════════════
 const SYSTEM_CHAT = `Você é o Planilheiro, um agente especialista em Excel e Google Planilhas, focado em ajudar usuários a resolver problemas com fórmulas. Seu nível de explicação é claro, didático e prático, adaptado tanto para iniciantes quanto para intermediários.
 
 NO PLANO BÁSICO você:
 1. Conserta fórmulas com erros — identifica o problema, explica o que estava errado e entrega a fórmula corrigida
-2. Explica fórmulas passo a passo com exemplos simples e ensina como adaptar para outros cenários
-3. Trabalha com: SOMASE, SE, PROCV, PROCX, ÍNDICE, CORRESP, CONT.SE, CONT.SES, FILTRO, ÚNICO, datas, textos, porcentagens, referências relativas e absolutas
+2. Explica fórmulas passo a passo com exemplos simples
+3. Trabalha com: SOMASE, SE, PROCV, PROCX, ÍNDICE, CORRESP, CONT.SE, FILTRO, ÚNICO, datas, textos, porcentagens
 
 COMPORTAMENTO OBRIGATÓRIO:
 - Quando o usuário pedir uma fórmula ou ajuda, SEMPRE pergunte primeiro:
@@ -516,106 +262,145 @@ COMPORTAMENTO OBRIGATÓRIO:
 - Só entregue a resposta DEPOIS que o usuário escolher
 - Se escolher passo a passo: numere cada etapa, use linguagem simples, dê exemplos
 - Se escolher fórmula pronta: entregue em bloco de código com breve explicação de cada parte
-- Evite termos técnicos sem explicação para iniciantes
-- NÃO entregue arquivos no plano básico — apenas orientação, explicação e fórmulas
+- NÃO entregue arquivos no plano básico
 
 Responda sempre em português do Brasil.`;
 
-const SYSTEM_GERADOR = `Você é o Planilheiro, um agente especialista em Excel e Google Planilhas. No PLANO PREMIUM você cria modelos completos de planilhas prontas para uso.
+const SYSTEM_GERADOR = `Você é o Planilheiro Pro, um agente especialista em Excel que cria planilhas profissionais completas.
 
 FLUXO OBRIGATÓRIO:
 
-Passo 1 - Entender o que o usuário precisa:
-Faça as perguntas abaixo de forma natural (uma de cada vez):
-1. Qual tipo de planilha você precisa? (financeiro, vendas, estoque, fluxo de caixa, outro)
-2. É para uso pessoal ou empresarial?
-3. Quais informações principais você quer controlar?
-4. Tem alguma preferência de organização?
+Passo 1 – Entender a necessidade (UMA pergunta por vez):
+1. Qual tipo de planilha? (financeiro pessoal, vendas, estoque, fluxo de caixa, projetos, RH, outro)
+2. Uso pessoal ou empresarial?
+3. Quais dados/categorias principais quer controlar?
+4. Período: mensal, semanal, anual?
 
-Passo 2 - Confirmar a estrutura:
-Explique em texto simples quais abas vai criar e o que cada uma faz.
-Diga onde o usuário vai inserir os dados.
+Passo 2 – Confirmar estrutura:
+Descreva em 2-3 frases o que vai entregar. Peça confirmação.
 
-Passo 3 - Gerar o arquivo:
-Diga "Aqui está sua planilha pronta! Clique no botão abaixo para baixar." e gere OBRIGATORIAMENTE o bloco abaixo:
+Passo 3 – Gerar:
+Diga "Sua planilha está pronta! 🎉" e gere OBRIGATORIAMENTE um bloco:
 
-\`\`\`planilha
-COLE_O_JSON_AQUI
+\`\`\`planilha-pro
+JSON_AQUI
 \`\`\`
 
-O JSON deve seguir EXATAMENTE esta estrutura:
-{"filename":"nome-arquivo","sheets":[{"name":"NomeDaAba","headers":["Col1","Col2","Col3"],"rows":[["dado1","dado2","=FORMULA(A2)"],["dado3","dado4","=FORMULA(A3)"]]}]}
-
-REGRAS DO JSON:
-- filename: nome sem espaços, use hifens (ex: controle-financeiro)
-- sheets: TODAS as abas da planilha
-- Primeira aba SEMPRE "Instrucoes" explicando como usar
-- headers: cabeçalhos em português, claros e objetivos  
-- rows: mínimo 8 linhas com dados de exemplo REALISTAS e úteis
-- Colunas calculadas com fórmulas Excel reais: =SOMA(), =SE(), =SUMIFS(), =B2*C2, etc
-- O JSON deve ser válido — sem quebras de linha dentro de strings, use aspas duplas
-- Não inclua comentários no JSON
-
-AO ENTREGAR A PLANILHA:
-- Descreva para que serve cada aba
-- Explique onde o usuário insere os dados
-- Deixe claro que o modelo já está totalmente funcional com fórmulas prontas
-
-Modelos disponíveis: controle financeiro pessoal/empresarial, despesas e receitas, fluxo de caixa, vendas, estoque, orçamentos, dashboards
-
-Responda sempre em português do Brasil. Seja objetivo, didático e profissional.`;
-
-const CHIPS_GERADOR = ["Controle financeiro pessoal","Controle de estoque com alertas","Dashboard de vendas","Fluxo de caixa empresarial","Dashboard RH com turnover","Metas vs resultado Power BI"];
-
-let plano = null, modo = "chat", loading = false;
-let historico = { chat: [], gerador: [] };
-
-document.getElementById("senha-input").addEventListener("keydown", e => { if(e.key==="Enter") entrar(); });
-function togglePass() { const i=document.getElementById("senha-input"); i.type=i.type==="password"?"text":"password"; }
-
-function entrar() {
-  const s = document.getElementById("senha-input").value.trim().toUpperCase();
-  if (SENHAS_PRO.map(x=>x.toUpperCase()).includes(s))    { plano="pro";    iniciar(); return; }
-  if (SENHAS_BASICO.map(x=>x.toUpperCase()).includes(s)) { plano="basico"; iniciar(); return; }
-  document.getElementById("error-msg").style.display = "block";
-  document.getElementById("senha-input").value = "";
+ESTRUTURA EXATA DO JSON (sem comentários, JSON 100% válido):
+{
+  "palette": "ocean",
+  "filename": "nome-do-arquivo",
+  "dashboard": {
+    "title": "Título do Dashboard",
+    "subtitle": "Subtítulo descritivo · 2025",
+    "kpis": [
+      {"label": "Nome KPI", "formula": "=Dados!E16", "format": "currency", "sublabel": "Acumulado Jan-Dez", "accent": "00BFA5"},
+      {"label": "Nome KPI 2", "formula": "=Dados!F16", "format": "percent", "sublabel": "Média anual", "accent": "F5A623"}
+    ]
+  },
+  "sheets": [
+    {
+      "name": "NomeDaAba",
+      "headers": ["Mês", "Receita", "Despesa", "Lucro", "Margem %"],
+      "col_types": ["text", "currency", "currency", "currency", "percent"],
+      "formula_cols": [3, 4],
+      "totals_row": true,
+      "rows": [
+        ["Janeiro", 5500, 3200, "=C4-D4", "=(C4-D4)/C4"],
+        ["Fevereiro", 6000, 3400, "=C5-D5", "=(C5-D5)/C5"],
+        ["Março", 5800, 3100, "=C6-D6", "=(C6-D6)/C6"],
+        ["Abril", 6200, 3300, "=C7-D7", "=(C7-D7)/C7"],
+        ["Maio", 6500, 3500, "=C8-D8", "=(C8-D8)/C8"],
+        ["Junho", 7000, 3800, "=C9-D9", "=(C9-D9)/C9"],
+        ["Julho", 6800, 3600, "=C10-D10", "=(C10-D10)/C10"],
+        ["Agosto", 7200, 3900, "=C11-D11", "=(C11-D11)/C11"],
+        ["Setembro", 7500, 4000, "=C12-D12", "=(C12-D12)/C12"],
+        ["Outubro", 7100, 3800, "=C13-D13", "=(C13-D13)/C13"],
+        ["Novembro", 7800, 4200, "=C14-D14", "=(C14-D14)/C14"],
+        ["Dezembro", 8500, 4600, "=C15-D15", "=(C15-D15)/C15"]
+      ]
+    }
+  ]
 }
 
-function iniciar() {
-  document.getElementById("login-screen").style.display = "none";
-  document.getElementById("app-screen").style.display = "flex";
-  if (plano === "basico") {
-    document.getElementById("brand-plan-text").textContent = "Plano Básico";
-    document.getElementById("plan-badge").textContent = "⚡ Básico";
-    document.getElementById("btn-upgrade").style.display = "inline-block";
-    document.getElementById("tab-pro").style.display = "inline";
-    document.getElementById("tab-gerador").disabled = true;
+REGRAS CRÍTICAS:
+- palette: "ocean" (azul), "forest" (verde), "midnight" (roxo), "corporate" (corporativo azul)
+- filename: sem espaços, use hifens (ex: controle-financeiro-2025)
+- col_types por coluna: "text", "currency", "percent", "number", "date"
+- formula_cols: índices 0-based das colunas que contêm fórmulas (usuário NÃO edita)
+- totals_row: true para adicionar linha de TOTAL automática
+- kpis[].format: "currency", "percent", "number"
+- kpis[].formula: referencia a célula de TOTAL da aba (ex: "=Dados!C16" onde 16 = header(1) + 12 linhas de dados + 1 total + 2 linhas de offset do layout)
+- rows: SEMPRE 12 meses ou mínimo 8 itens com dados realistas
+- Fórmulas nas rows: referências relativas corretas para a linha Excel real (dados começam na linha 4 do Excel, pois há banner nas linhas 1-2 e header na 3)
+- Se precisar de múltiplas abas (ex: Receitas + Despesas separadas), adicione múltiplos objetos em "sheets"
+- JSON deve ser completamente válido: aspas duplas, sem trailing commas, sem comentários
+
+SUGESTÃO DE PALETA POR TIPO:
+- Pessoal/Financeiro → "ocean" ou "forest"
+- Empresarial/Corporativo → "corporate"
+- Tecnologia/Moderno → "midnight"
+
+Responda sempre em português do Brasil.`;
+
+// ═══════════════════════════════════════════════════════
+//  ESTADO GLOBAL
+// ═══════════════════════════════════════════════════════
+let plano = null, modo = "chat", loading = false;
+let historico = { chat:[], gerador:[] };
+
+// ═══════════════════════════════════════════════════════
+//  LOGIN
+// ═══════════════════════════════════════════════════════
+document.getElementById("senha-input").addEventListener("keydown", e => { if(e.key==="Enter") entrar(); });
+function togglePass(){ const i=document.getElementById("senha-input"); i.type=i.type==="password"?"text":"password"; }
+
+function entrar(){
+  const s = document.getElementById("senha-input").value.trim().toUpperCase();
+  if(SENHAS_PRO.map(x=>x.toUpperCase()).includes(s))    { plano="pro";    iniciar(); return; }
+  if(SENHAS_BASICO.map(x=>x.toUpperCase()).includes(s)) { plano="basico"; iniciar(); return; }
+  document.getElementById("error-msg").style.display="block";
+  document.getElementById("senha-input").value="";
+}
+
+function iniciar(){
+  document.getElementById("login-screen").style.display="none";
+  document.getElementById("app-screen").style.display="flex";
+  if(plano==="basico"){
+    document.getElementById("brand-plan-text").textContent="Plano Básico";
+    document.getElementById("plan-badge").textContent="⚡ Básico";
+    document.getElementById("btn-upgrade").style.display="inline-block";
+    document.getElementById("tab-pro").style.display="inline";
+    document.getElementById("tab-gerador").disabled=true;
   }
-  const bv = plano === "pro"
-    ? "Olá! 👋 Sou o **Planilheiro** — pode me mandar qualquer dúvida sobre **fórmulas**, **erros** ou **DAX**. Explico tudo de forma simples!\n\n✦ **Plano Pro ativo** — acesso completo e ilimitado."
-    : "Olá! 👋 Sou o **Planilheiro** — pode me mandar qualquer dúvida sobre **fórmulas**, **erros** ou **DAX**. Explico tudo de forma simples!\n\n⚡ **Plano Básico** — " + Math.max(0, LIMITE_BASICO - getUsos()) + " perguntas restantes hoje.";
-  exibeMsg("assistant", bv);
+  const msg = plano==="pro"
+    ? "Olá! 👋 Sou o **Planilheiro** — mande qualquer dúvida sobre **fórmulas**, **erros** ou **DAX**.\n\n✦ **Plano Pro ativo** — use a aba **⚡ Gerar Planilha** para receber arquivos Excel profissionais com dashboard e gráficos!"
+    : "Olá! 👋 Sou o **Planilheiro** — mande qualquer dúvida sobre **fórmulas**, **erros** ou **DAX**.\n\n⚡ **Plano Básico** — "+Math.max(0,LIMITE_BASICO-getUsos())+" perguntas restantes hoje.";
+  exibeMsg("assistant", msg);
   renderChips();
   checkBanners();
 }
 
-function sair() { location.reload(); }
+function sair(){ location.reload(); }
 
-function setMode(m) {
-  if (m==="gerador" && plano==="basico") return;
+// ═══════════════════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════════════════
+function setMode(m){
+  if(m==="gerador" && plano==="basico") return;
   modo = m;
   document.getElementById("tab-chat").classList.toggle("active", m==="chat");
   document.getElementById("tab-gerador").classList.toggle("active", m==="gerador");
-  document.getElementById("info-bar").style.display = m==="gerador" ? "block" : "none";
+  document.getElementById("info-bar").style.display = m==="gerador"?"block":"none";
   document.getElementById("msg-input").placeholder = m==="chat"
     ? "Cole sua fórmula, descreva o erro ou faça uma pergunta..."
-    : "Ex: quero um dashboard de vendas com metas mensais...";
-  document.getElementById("chips-label").textContent = m==="chat" ? "Perguntas frequentes" : "Exemplos";
-  document.getElementById("chat-inner").innerHTML = "";
-  if (historico[modo].length === 0) {
+    : "Ex: quero um controle financeiro pessoal com receitas e despesas mensais...";
+  document.getElementById("chips-label").textContent = m==="chat"?"Perguntas frequentes":"Exemplos";
+  document.getElementById("chat-inner").innerHTML="";
+  if(historico[modo].length===0){
     const bv = m==="gerador"
-      ? "Pronto para montar sua **planilha** ou **dashboard**! 🚀\n\nMe conta o que precisa — vou fazer as perguntas certas para entregar algo 100% personalizado para você."
-      : "Olá! 👋 Sou o **Planilheiro** — pode me mandar qualquer dúvida sobre **fórmulas**, **erros** ou **DAX**.";
+      ? "Pronto para criar sua **planilha profissional**! 🚀\n\nVou entregar um arquivo Excel com:\n- ✦ **Dashboard** com KPIs visuais e cores\n- ✦ **Gráficos** automáticos\n- ✦ **Fórmulas** prontas\n- ✦ **Design** profissional\n\nMe conta: **que tipo de planilha você precisa?**"
+      : "Olá! 👋 Sou o **Planilheiro** — mande qualquer dúvida sobre **fórmulas** ou **erros**.";
     exibeMsg("assistant", bv);
   } else {
     historico[modo].forEach(msg => exibeMsg(msg.role, msg.content));
@@ -624,230 +409,551 @@ function setMode(m) {
   checkBanners();
 }
 
-function extrairPlanilhaJSON(text) {
-  const OPEN = "```planilha";
-  const si = text.indexOf(OPEN);
-  if (si === -1) return null;
-
-  const afterOpen = text.substring(si + OPEN.length);
-  const closeIdx = afterOpen.indexOf("```");
-  const raw = closeIdx !== -1 ? afterOpen.substring(0, closeIdx) : afterOpen;
-
-  // Limpeza agressiva do JSON
-  let jsonStr = raw.trim();
-
-  // Remove quebras de linha DENTRO de strings (problema comum do Claude)
-  // Estrategia: juntar tudo numa linha, normalizar espacos
-  jsonStr = jsonStr
-    .replace(/\r\n/g, " ")
-    .replace(/\n/g, " ")
-    .replace(/\r/g, " ")
-    .replace(/\t/g, " ")
-    .replace(/[\u0000-\u001F\u007F-\u009F]/g, " ")
-    .replace(/,\s*}/g, "}")
-    .replace(/,\s*]/g, "]")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  // Tenta parsear direto
-  try {
-    const parsed = JSON.parse(jsonStr);
-    if (parsed && parsed.sheets) return parsed;
-  } catch(e1) {
-    // Tenta encontrar o JSON com regex — pega tudo entre { e o ultimo }
-    try {
-      const match = jsonStr.match(/\{.*\}/s);
-      if (match) {
-        const parsed = JSON.parse(match[0]);
-        if (parsed && parsed.sheets) return parsed;
-      }
-    } catch(e2) {
-      // Tenta consertar aspas simples usadas por engano
-      try {
-        const fixed = jsonStr.replace(/'/g, '"');
-        const parsed = JSON.parse(fixed);
-        if (parsed && parsed.sheets) return parsed;
-      } catch(e3) {
-        console.error("Falha total no parse. JSON recebido:", jsonStr.substring(0, 400));
-      }
-    }
+// ═══════════════════════════════════════════════════════
+//  PARSE DO JSON DO CLAUDE
+// ═══════════════════════════════════════════════════════
+function extrairJSON(text){
+  const OPEN="```planilha-pro";
+  const si=text.indexOf(OPEN);
+  if(si===-1) return null;
+  const after=text.substring(si+OPEN.length);
+  const ci=after.indexOf("```");
+  const raw=ci!==-1?after.substring(0,ci):after;
+  let s=raw.trim()
+    .replace(/\r\n|\n|\r|\t/g," ")
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g," ")
+    .replace(/,\s*}/g,"}").replace(/,\s*]/g,"]")
+    .replace(/\s+/g," ").trim();
+  for(const attempt of [s, s.match(/\{.*\}/s)?.[0], s.replace(/'/g,'"')]){
+    if(!attempt) continue;
+    try{ const p=JSON.parse(attempt); if(p&&p.sheets) return p; }catch(e){}
   }
+  console.error("JSON parse falhou:", s.substring(0,400));
   return null;
 }
 
-function limparBlocoPlanilha(text) {
-  const OPEN = "```planilha";
-  const si = text.indexOf(OPEN);
-  if (si === -1) return text;
-  const afterOpen = text.substring(si + OPEN.length);
-  const closeIdx = afterOpen.indexOf("```");
-  const end = closeIdx !== -1 ? si + OPEN.length + closeIdx + 3 : text.length;
-  return (text.substring(0, si) + text.substring(end)).trim();
+function limparBloco(text){
+  const OPEN="```planilha-pro";
+  const si=text.indexOf(OPEN);
+  if(si===-1) return text;
+  const after=text.substring(si+OPEN.length);
+  const ci=after.indexOf("```");
+  const end=ci!==-1?si+OPEN.length+ci+3:text.length;
+  return (text.substring(0,si)+text.substring(end)).trim();
 }
 
-function exibeMsg(role, content) {
-  const ci = document.getElementById("chat-inner");
-  const isUser = role === "user";
-  const div = document.createElement("div");
-  div.className = "msg" + (isUser ? " user" : "");
-  if (!isUser) {
-    const av = document.createElement("div");
-    av.className = "msg-avatar";
-    av.textContent = "📊";
+// ═══════════════════════════════════════════════════════
+//  GERADOR DE EXCEL COM EXCELJS
+// ═══════════════════════════════════════════════════════
+
+// Formatos de número
+const NUM_FMT = {
+  currency: '"R$"#,##0.00',
+  percent:  '0.0%',
+  number:   '#,##0.00',
+  text:     '@',
+  date:     'dd/mm/yyyy',
+};
+
+function hexColor(hex){ return { argb: "FF"+hex.replace("#","").toUpperCase() }; }
+function fgColor(hex){ return { type:"pattern", pattern:"solid", fgColor:hexColor(hex) }; }
+
+function hdrFont(p, size=11, bold=true){
+  return { name:"Calibri", bold, size, color:hexColor(p.hdrFg) };
+}
+function bodyFont(size=10, bold=false, color="1A1A1A"){
+  return { name:"Calibri", bold, size, color:hexColor(color) };
+}
+function centerAlign(wrapText=false){
+  return { horizontal:"center", vertical:"middle", wrapText };
+}
+function leftAlign(){
+  return { horizontal:"left", vertical:"middle" };
+}
+function rightAlign(){
+  return { horizontal:"right", vertical:"middle" };
+}
+function thinBorder(color="CCCCCC"){
+  const s={ style:"thin", color:hexColor(color) };
+  return { top:s, left:s, bottom:s, right:s };
+}
+function bottomBorder(color="DDDDDD"){
+  const s={ style:"thin", color:hexColor(color) };
+  return { bottom:s };
+}
+
+async function gerarExcel(payload, palette){
+  const p = PALETTES[palette] || PALETTES.ocean;
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "O Planilheiro";
+  wb.created = new Date();
+
+  // ── 1. ABA INSTRUÇÕES ──────────────────────────────────
+  const wi = wb.addWorksheet("Instruções");
+  wi.views = [{ showGridLines:false }];
+  wi.getColumn(1).width = 3;
+  wi.getColumn(2).width = 68;
+  wi.tabColor = hexColor(p.acc1);
+
+  const wsTitle = wi.getRow(2);
+  wsTitle.height = 44;
+  wi.mergeCells("B2:J2");
+  const tc = wi.getCell("B2");
+  tc.value = "📋  GUIA DE USO  —  O Planilheiro Pro";
+  tc.font = { name:"Calibri", bold:true, size:18, color:hexColor(p.hdrFg) };
+  tc.fill = fgColor(p.hdrBg);
+  tc.alignment = { horizontal:"left", vertical:"middle", indent:1 };
+
+  wi.mergeCells("B3:J3");
+  wi.getCell("B3").fill = fgColor(p.acc1);
+  wi.getRow(3).height = 5;
+
+  const steps = [
+    ["📌 Como usar", "Esta planilha foi gerada pelo Planilheiro Pro. Siga as instruções abaixo para personalizar."],
+    ["1️⃣  Aba de dados", "Substitua os valores de exemplo pelos seus dados reais. Não altere as células com fórmulas."],
+    ["2️⃣  Dashboard", "O dashboard atualiza automaticamente. Não precisa editar nada lá."],
+    ["💡 Exportar PDF", "Arquivo → Exportar como PDF. Recomendamos orientação paisagem, escala 85%."],
+    ["📞 Suporte", "Dúvidas? Volte ao Planilheiro e descreva o que precisa ajustar."],
+  ];
+  let row=5;
+  for(const [title,desc] of steps){
+    wi.mergeCells(`B${row}:J${row}`);
+    const ct=wi.getCell(`B${row}`);
+    ct.value="  "+title; ct.font={name:"Calibri",bold:true,size:11,color:hexColor(p.acc1)};
+    ct.fill=fgColor("EAF7F3"); ct.alignment={horizontal:"left",vertical:"middle"};
+    wi.getRow(row).height=24; row++;
+    wi.mergeCells(`B${row}:J${row}`);
+    const cd=wi.getCell(`B${row}`);
+    cd.value=desc; cd.font={name:"Calibri",size:10,color:hexColor("1A1A1A")};
+    cd.fill=fgColor(p.bodyBg); cd.alignment={horizontal:"left",vertical:"middle",wrapText:true};
+    wi.getRow(row).height=38; row+=2;
+  }
+
+  // ── 2. ABAS DE DADOS ───────────────────────────────────
+  const sheetRefs = {}; // para referências do dashboard
+
+  for(const sheetDef of (payload.sheets||[])){
+    const wsName  = sheetDef.name || "Dados";
+    const headers = sheetDef.headers || [];
+    const rows    = sheetDef.rows || [];
+    const colTypes= sheetDef.col_types || headers.map(()=>"text");
+    const fmulCols= new Set(sheetDef.formula_cols||[]);
+    const doTotals= sheetDef.totals_row !== false;
+    const nCols   = headers.length;
+
+    const ws = wb.addWorksheet(wsName);
+    ws.views = [{ showGridLines:false }];
+    ws.tabColor = hexColor(p.acc1);
+
+    // Título da aba (rows 1–2)
+    ws.mergeCells(1,1,1,Math.max(nCols,6));
+    const bnr=ws.getCell(1,1);
+    bnr.value="  "+wsName.toUpperCase();
+    bnr.font={name:"Calibri",bold:true,size:14,color:hexColor(p.hdrFg)};
+    bnr.fill=fgColor(p.hdrBg);
+    bnr.alignment={horizontal:"left",vertical:"middle",indent:1};
+    ws.getRow(1).height=36;
+
+    ws.mergeCells(2,1,2,Math.max(nCols,6));
+    ws.getCell(2,1).fill=fgColor(p.acc1);
+    ws.getRow(2).height=4;
+
+    // Cabeçalhos (row 3)
+    ws.getRow(3).height=30;
+    for(let ci=0;ci<nCols;ci++){
+      const c=ws.getCell(3,ci+1);
+      c.value=headers[ci];
+      c.font=hdrFont(p,10,true);
+      c.fill=fgColor(p.hdrBg);
+      c.alignment=centerAlign(true);
+      c.border=thinBorder(p.border);
+      // largura da coluna
+      const w=Math.max((headers[ci]||"").length+6, 14);
+      ws.getColumn(ci+1).width=w;
+    }
+
+    // Dados (a partir da row 4)
+    const DATA_START=4;
+    for(let ri=0;ri<rows.length;ri++){
+      const excelRow=DATA_START+ri;
+      const bg=ri%2===0?p.altRow:p.bodyBg;
+      const rowData=rows[ri];
+      ws.getRow(excelRow).height=22;
+
+      for(let ci=0;ci<nCols;ci++){
+        const c=ws.getCell(excelRow,ci+1);
+        const val=rowData[ci]!==undefined?rowData[ci]:"";
+        c.value=val;
+        c.fill=fgColor(bg);
+        c.font=bodyFont(10, fmulCols.has(ci), fmulCols.has(ci)?p.hdrBg:"1A1A1A");
+        c.alignment=ci===0?leftAlign():rightAlign();
+        c.border=bottomBorder(p.border);
+        const fmt=NUM_FMT[colTypes[ci]];
+        if(fmt && fmt!=="@") c.numFmt=fmt;
+      }
+    }
+
+    // Linha de totais
+    const totalRow=DATA_START+rows.length;
+    sheetRefs[wsName]=totalRow; // guarda referência para o dashboard
+
+    if(doTotals && rows.length>0){
+      ws.getRow(totalRow).height=28;
+      for(let ci=0;ci<nCols;ci++){
+        const c=ws.getCell(totalRow,ci+1);
+        if(ci===0){
+          c.value="TOTAL";
+          c.alignment={horizontal:"left",vertical:"middle",indent:1};
+        } else {
+          const colL=String.fromCharCode(64+ci+1); // A=65, col 2 = B
+          const typ=colTypes[ci];
+          if(typ==="currency"||typ==="number"){
+            c.value={ formula:`SUM(${colL}${DATA_START}:${colL}${totalRow-1})` };
+            if(NUM_FMT[typ]) c.numFmt=NUM_FMT[typ];
+          } else if(typ==="percent"){
+            // média ponderada aproximada: média simples
+            c.value={ formula:`AVERAGE(${colL}${DATA_START}:${colL}${totalRow-1})` };
+            c.numFmt=NUM_FMT.percent;
+          }
+        }
+        c.font={name:"Calibri",bold:true,size:10,color:hexColor(p.hdrFg)};
+        c.fill=fgColor(p.hdrBg);
+        c.alignment=ci===0?{horizontal:"left",vertical:"middle",indent:1}:{horizontal:"right",vertical:"middle"};
+      }
+    }
+
+    // Formatos de coluna finais (largura mínima)
+    ws.getColumn(1).width=Math.max(ws.getColumn(1).width||12, 13);
+  }
+
+  // ── 3. ABA DASHBOARD ──────────────────────────────────
+  if(payload.dashboard){
+    const dash=payload.dashboard;
+    const wd=wb.addWorksheet("Dashboard");
+    wd.views=[{showGridLines:false}];
+    wd.tabColor=hexColor(p.acc2);
+
+    // Título
+    wd.mergeCells("A1:N1");
+    const dt=wd.getCell("A1");
+    dt.value="  📊  "+(dash.title||"Dashboard").toUpperCase();
+    dt.font={name:"Calibri",bold:true,size:20,color:hexColor(p.hdrFg)};
+    dt.fill=fgColor(p.hdrBg);
+    dt.alignment={horizontal:"left",vertical:"middle",indent:1};
+    wd.getRow(1).height=52;
+
+    wd.mergeCells("A2:N2");
+    wd.getCell("A2").fill=fgColor(p.acc1);
+    wd.getRow(2).height=5;
+
+    wd.mergeCells("A3:N3");
+    const ds=wd.getCell("A3");
+    ds.value="  "+(dash.subtitle||"Visão Executiva");
+    ds.font={name:"Calibri",size:11,italic:true,color:hexColor("7090A0")};
+    ds.fill=fgColor(p.bodyBg);
+    ds.alignment={horizontal:"left",vertical:"middle",indent:1};
+    wd.getRow(3).height=22;
+    wd.getRow(4).height=10;
+
+    // KPI Cards
+    const kpis=dash.kpis||[];
+    const CARD_W=3; // colunas por card
+    const colors=[p.acc1,p.acc2,p.acc3];
+
+    for(let ki=0;ki<kpis.length;ki++){
+      const kpi=kpis[ki];
+      const cs=1+ki*(CARD_W+1);
+      const ce=cs+CARD_W-1;
+      const accent=kpi.accent||colors[ki%3];
+
+      // Label (row 5)
+      wd.mergeCells(5,cs,5,ce);
+      const cl=wd.getCell(5,cs);
+      cl.value=(kpi.label||"KPI").toUpperCase();
+      cl.font={name:"Calibri",bold:true,size:8,color:hexColor("AABBCC")};
+      cl.fill=fgColor(p.kpiBg);
+      cl.alignment=centerAlign();
+      wd.getRow(5).height=18;
+
+      // Valor (row 6)
+      wd.mergeCells(6,cs,6,ce);
+      const cv=wd.getCell(6,cs);
+      cv.value=kpi.formula?{formula:kpi.formula.replace(/^=/,"")}:0;
+      cv.font={name:"Calibri",bold:true,size:26,color:hexColor(accent)};
+      cv.fill=fgColor(p.kpiBg);
+      cv.alignment=centerAlign();
+      cv.numFmt=kpi.format==="percent"?"0.0%":kpi.format==="number"?"#,##0.00":'"R$"#,##0.00';
+      wd.getRow(6).height=48;
+
+      // Sublabel (row 7)
+      wd.mergeCells(7,cs,7,ce);
+      const csl=wd.getCell(7,cs);
+      csl.value=kpi.sublabel||"Acumulado";
+      csl.font={name:"Calibri",size:8,color:hexColor("778899")};
+      csl.fill=fgColor(p.kpiBg);
+      csl.alignment=centerAlign();
+      wd.getRow(7).height=16;
+
+      // Stripe (row 8)
+      wd.mergeCells(8,cs,8,ce);
+      wd.getCell(8,cs).fill=fgColor(accent);
+      wd.getRow(8).height=7;
+    }
+
+    wd.getRow(9).height=16;
+
+    // Nota
+    wd.mergeCells("A10:N10");
+    const nt=wd.getCell("A10");
+    nt.value="  ℹ️  Os valores são calculados automaticamente a partir dos dados inseridos nas abas de dados. Atualize os dados e salve para recalcular.";
+    nt.font={name:"Calibri",size:9,italic:true,color:hexColor("7090A0")};
+    nt.fill=fgColor(p.bodyBg);
+    nt.alignment={horizontal:"left",vertical:"middle",wrapText:true};
+    wd.getRow(10).height=28;
+
+    // Largura das colunas
+    for(let c=1;c<=14;c++) wd.getColumn(c).width=9;
+  }
+
+  // ── 4. REORDENAR ABAS (Dashboard primeiro, Instruções segundo) ──
+  // ExcelJS: worksheets são adicionadas na ordem; vamos mover
+  // Instrucoes foi criada primeiro, Dashboard depois — precisamos inverter a ordem de exibição
+  // Workaround: recriar na ordem correta (ExcelJS não tem moveSheet nativo no browser)
+  // Solução: a ordem atual já é Instruções → sheets → Dashboard
+  // Vamos deixar assim — usuário vê Instruções primeiro, dados depois, Dashboard por último
+
+  // ── 5. DOWNLOAD ───────────────────────────────────────
+  const filename=(payload.filename||"planilheiro")+".xlsx";
+  const buffer=await wb.xlsx.writeBuffer();
+  const blob=new Blob([buffer],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+  saveAs(blob, filename);
+}
+
+// ═══════════════════════════════════════════════════════
+//  EXIBIR MENSAGEM NO CHAT
+// ═══════════════════════════════════════════════════════
+function exibeMsg(role, content){
+  const ci=document.getElementById("chat-inner");
+  const isUser=role==="user";
+  const div=document.createElement("div");
+  div.className="msg"+(isUser?" user":"");
+
+  if(!isUser){
+    const av=document.createElement("div");
+    av.className="msg-avatar"; av.textContent="📊";
     div.appendChild(av);
   }
-  const bubble = document.createElement("div");
-  bubble.className = "msg-bubble";
 
-  if (role === "assistant" && content.indexOf("```planilha") !== -1) {
-    console.log("=== BLOCO PLANILHA DETECTADO ===");
-    console.log("Conteudo completo:", content.substring(0, 500));
-    const jsonData = extrairPlanilhaJSON(content);
-    console.log("JSON parseado:", jsonData);
-    const displayContent = limparBlocoPlanilha(content);
-    bubble.innerHTML = formatMsg(displayContent);
+  const bubble=document.createElement("div");
+  bubble.className="msg-bubble";
 
-    if (jsonData) {
-      const sep = document.createElement("div");
-      sep.style.cssText = "margin-top:16px;padding-top:14px;border-top:1px solid var(--border);";
-      const btn = document.createElement("button");
-      btn.className = "btn-download";
-      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar planilha Excel (.xlsx)';
-      btn.onclick = () => gerarExcel(jsonData);
-      sep.appendChild(btn);
-      bubble.appendChild(sep);
+  const hasPro=role==="assistant"&&content.includes("```planilha-pro");
+
+  if(hasPro){
+    const parsedPayload=extrairJSON(content);
+    const displayText=limparBloco(content);
+    bubble.innerHTML=formatMsg(displayText);
+
+    // Palette picker
+    const palRow=document.createElement("div");
+    palRow.className="palette-row";
+    const palLabel=document.createElement("div");
+    palLabel.style.cssText="font-size:11px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;width:100%";
+    palLabel.textContent="Escolha o tema:";
+    palRow.appendChild(palLabel);
+    Object.entries(PALETTES).forEach(([key,pal])=>{
+      const btn=document.createElement("button");
+      btn.className="pal-btn"+(key===selectedPalette?" active":"");
+      btn.dataset.pal=key;
+      btn.innerHTML=`<span class="pal-dot" style="background:${pal.dot}"></span>${pal.label}`;
+      btn.onclick=()=>{
+        selectedPalette=key;
+        document.querySelectorAll(".pal-btn").forEach(b=>b.classList.toggle("active",b.dataset.pal===key));
+      };
+      palRow.appendChild(btn);
+    });
+    bubble.appendChild(palRow);
+
+    // Download card
+    const card=document.createElement("div");
+    card.className="dl-card";
+    const cardTop=document.createElement("div");
+    cardTop.className="dl-card-top";
+
+    const sheetCount=parsedPayload?parsedPayload.sheets.length:0;
+    const kpiCount=parsedPayload?.dashboard?.kpis?.length||0;
+    const cardTitle=parsedPayload?.dashboard?.title||parsedPayload?.filename||"Planilha";
+
+    cardTop.innerHTML=`
+      <div class="dl-card-icon">📊</div>
+      <div class="dl-card-info">
+        <div class="dl-card-title">${cardTitle}</div>
+        <div class="dl-card-sub">${sheetCount} aba(s) de dados · ${kpiCount} KPIs · Dashboard + Fórmulas prontas</div>
+      </div>`;
+    card.appendChild(cardTop);
+
+    const cardActions=document.createElement("div");
+    cardActions.className="dl-card-actions";
+
+    const btn=document.createElement("button");
+    btn.className="btn-dl";
+    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar Planilha .xlsx`;
+
+    if(parsedPayload){
+      btn.onclick=async()=>{
+        btn.disabled=true;
+        btn.textContent="⏳ Gerando arquivo...";
+        try{
+          // Injeta a paleta selecionada pelo usuário no momento do clique
+          parsedPayload.palette=selectedPalette;
+          await gerarExcel(parsedPayload, selectedPalette);
+          btn.innerHTML="✅ Download iniciado!";
+          btn.style.background="#27AE60";
+          setTimeout(()=>{
+            btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar novamente`;
+            btn.style.background="";
+            btn.disabled=false;
+          },3000);
+        }catch(err){
+          console.error("Erro ao gerar Excel:", err);
+          btn.innerHTML="❌ Erro — tente novamente";
+          btn.style.background="#E84855";
+          btn.disabled=false;
+          setTimeout(()=>{
+            btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar Planilha .xlsx`;
+            btn.style.background="";
+          },3000);
+        }
+      };
     } else {
-      // JSON nao parseou mas tem o bloco — mostra aviso
-      const warn = document.createElement("div");
-      warn.style.cssText = "margin-top:12px;padding:10px 14px;background:#fef3cd;border:1px solid #fde68a;border-radius:8px;font-size:13px;color:#92400e;";
-      warn.textContent = "⚠️ Houve um problema ao gerar o arquivo. Por favor, peça novamente.";
-      bubble.appendChild(warn);
+      btn.disabled=true;
+      btn.title="Erro ao processar. Peça ao Planilheiro para gerar novamente.";
     }
+
+    cardActions.appendChild(btn);
+    card.appendChild(cardActions);
+
+    if(!parsedPayload){
+      const warn=document.createElement("div");
+      warn.style.cssText="padding:0 18px 14px;font-size:11px;color:#dc2626";
+      warn.textContent="⚠️ Erro ao processar a planilha. Por favor, peça para gerar novamente.";
+      card.appendChild(warn);
+    }
+
+    bubble.appendChild(card);
   } else {
-    bubble.innerHTML = formatMsg(content);
+    bubble.innerHTML=formatMsg(content);
   }
 
   div.appendChild(bubble);
   ci.appendChild(div);
-  document.getElementById("chat-area").scrollTop = 999999;
-  document.getElementById("chips-area").style.display = historico[modo].length === 0 ? "block" : "none";
+  document.getElementById("chat-area").scrollTop=999999;
+  document.getElementById("chips-area").style.display=historico[modo].length===0?"block":"none";
 }
 
-function gerarExcel(data) {
-  try {
-    const wb = XLSX.utils.book_new();
-    data.sheets.forEach(sheet => {
-      const wsData = [sheet.headers, ...sheet.rows];
-      const ws = XLSX.utils.aoa_to_sheet(wsData);
-      // Largura automática das colunas
-      const colWidths = sheet.headers.map((h, i) => ({
-        wch: Math.max(h.length, ...sheet.rows.map(r => String(r[i] || "").length), 12)
-      }));
-      ws["!cols"] = colWidths;
-      XLSX.utils.book_append_sheet(wb, ws, sheet.name);
-    });
-    XLSX.writeFile(wb, (data.filename || "planilheiro") + ".xlsx");
-  } catch(e) {
-    alert("Erro ao gerar o arquivo. Tente novamente.");
-    console.error(e);
-  }
-}
-
-function formatMsg(text) {
-  return text.split(/(```[\s\S]*?```)/g).map(part => {
-    if (part.startsWith("```") && part.endsWith("```")) {
+function formatMsg(text){
+  return text.split(/(```[\s\S]*?```)/g).map(part=>{
+    if(part.startsWith("```")&&part.endsWith("```")){
       return `<div class="msg-code">${esc(part.slice(3,-3).replace(/^\w+\n/,""))}</div>`;
     }
     return part
       .replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>")
       .replace(/## (.*?)(\n|$)/g,"<div style='font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.1em;margin-top:16px;margin-bottom:6px'>$1</div>")
       .replace(/### (.*?)(\n|$)/g,"<div style='font-weight:700;color:var(--txt);margin-top:12px;margin-bottom:4px'>$1</div>")
+      .replace(/- (.*?)(\n|$)/g,"<div style='padding-left:14px;margin:2px 0'>• $1</div>")
       .replace(/\n/g,"<br/>");
   }).join("");
 }
+function esc(t){ return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-function esc(t) { return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-
-function renderChips() {
-  const chips = modo==="chat" ? CHIPS_CHAT : CHIPS_GERADOR;
-  const cl = document.getElementById("chips-list"); cl.innerHTML = "";
-  chips.forEach(c => {
-    const btn = document.createElement("button");
-    btn.className = "chip"; btn.textContent = c;
-    btn.onclick = () => enviar(c);
+// ═══════════════════════════════════════════════════════
+//  CHIPS
+// ═══════════════════════════════════════════════════════
+function renderChips(){
+  const chips=modo==="chat"?CHIPS_CHAT:CHIPS_GERADOR;
+  const cl=document.getElementById("chips-list"); cl.innerHTML="";
+  chips.forEach(c=>{
+    const btn=document.createElement("button");
+    btn.className="chip"; btn.textContent=c;
+    btn.onclick=()=>enviar(c);
     cl.appendChild(btn);
   });
 }
 
-function getUsos() { const hoje=new Date().toDateString(); const s=localStorage.getItem("pl_usos"); if(!s) return 0; const p=JSON.parse(s); return p.data!==hoje?0:p.count; }
-function addUso() { const hoje=new Date().toDateString(); const count=getUsos()+1; localStorage.setItem("pl_usos",JSON.stringify({data:hoje,count})); return count; }
-
-function checkBanners() {
-  if (plano !== "basico") return;
-  const restantes = LIMITE_BASICO - getUsos();
-  document.getElementById("banner-warn").style.display = restantes <= 10 && restantes > 0 ? "block" : "none";
-  document.getElementById("banner-block").style.display = restantes <= 0 ? "flex" : "none";
-  if (restantes <= 10 && restantes > 0) document.getElementById("banner-warn").textContent = `⚠️ Você tem apenas ${restantes} perguntas restantes hoje.`;
-  document.getElementById("brand-plan-text").textContent = `Plano Básico · ${Math.max(0,restantes)} restantes`;
+// ═══════════════════════════════════════════════════════
+//  LIMITES PLANO BÁSICO
+// ═══════════════════════════════════════════════════════
+function getUsos(){ const hoje=new Date().toDateString(); const s=localStorage.getItem("pl_usos"); if(!s) return 0; const p=JSON.parse(s); return p.data!==hoje?0:p.count; }
+function addUso(){ const hoje=new Date().toDateString(); const count=getUsos()+1; localStorage.setItem("pl_usos",JSON.stringify({data:hoje,count})); return count; }
+function checkBanners(){
+  if(plano!=="basico") return;
+  const r=LIMITE_BASICO-getUsos();
+  document.getElementById("banner-warn").style.display=r<=10&&r>0?"block":"none";
+  document.getElementById("banner-block").style.display=r<=0?"flex":"none";
+  if(r<=10&&r>0) document.getElementById("banner-warn").textContent=`⚠️ Você tem apenas ${r} perguntas restantes hoje.`;
+  document.getElementById("brand-plan-text").textContent=`Plano Básico · ${Math.max(0,r)} restantes`;
 }
 
-document.getElementById("msg-input").addEventListener("keydown", e => {
-  if (e.key==="Enter" && !e.shiftKey) { e.preventDefault(); enviar(); }
+// ═══════════════════════════════════════════════════════
+//  INPUT
+// ═══════════════════════════════════════════════════════
+document.getElementById("msg-input").addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); enviar(); }
 });
-document.getElementById("msg-input").addEventListener("input", function() {
-  this.style.height = "auto";
-  this.style.height = Math.min(this.scrollHeight, 120) + "px";
-  document.getElementById("send-btn").disabled = !this.value.trim() || loading;
+document.getElementById("msg-input").addEventListener("input",function(){
+  this.style.height="auto";
+  this.style.height=Math.min(this.scrollHeight,120)+"px";
+  document.getElementById("send-btn").disabled=!this.value.trim()||loading;
 });
 
-async function enviar(txt) {
-  const input = document.getElementById("msg-input");
-  const text = txt || input.value.trim();
-  if (!text || loading) return;
-  if (plano === "basico") { const t=addUso(); checkBanners(); if(t>LIMITE_BASICO) return; }
+// ═══════════════════════════════════════════════════════
+//  ENVIAR MENSAGEM
+// ═══════════════════════════════════════════════════════
+async function enviar(txt){
+  const input=document.getElementById("msg-input");
+  const text=txt||input.value.trim();
+  if(!text||loading) return;
+  if(plano==="basico"){ const t=addUso(); checkBanners(); if(t>LIMITE_BASICO) return; }
 
-  historico[modo].push({ role: "user", content: text });
-  exibeMsg("user", text);
-  input.value = ""; input.style.height = "auto";
-  document.getElementById("send-btn").disabled = true;
-  document.getElementById("chips-area").style.display = "none";
-  loading = true;
+  historico[modo].push({role:"user",content:text});
+  exibeMsg("user",text);
+  input.value=""; input.style.height="auto";
+  document.getElementById("send-btn").disabled=true;
+  document.getElementById("chips-area").style.display="none";
+  loading=true;
 
-  const ci = document.getElementById("chat-inner");
-  const typDiv = document.createElement("div");
-  typDiv.className = "msg"; typDiv.id = "typing";
-  typDiv.innerHTML = `<div class="msg-avatar">📊</div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  const ci=document.getElementById("chat-inner");
+  const typDiv=document.createElement("div");
+  typDiv.className="msg"; typDiv.id="typing";
+  typDiv.innerHTML=`<div class="msg-avatar">📊</div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
   ci.appendChild(typDiv);
-  document.getElementById("chat-area").scrollTop = 999999;
+  document.getElementById("chat-area").scrollTop=999999;
 
-  try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        system: modo==="chat" ? SYSTEM_CHAT : SYSTEM_GERADOR,
+  try{
+    const res=await fetch("/api/chat",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        system: modo==="chat"?SYSTEM_CHAT:SYSTEM_GERADOR,
         messages: historico[modo]
       })
     });
-    const data = await res.json();
-    const reply = data.text || "Desculpe, tive um problema. Tente novamente.";
-    const typingEl = document.getElementById("typing");
-    const typingTop = typingEl ? typingEl.offsetTop : null;
+    const data=await res.json();
+    const reply=data.text||"Desculpe, tive um problema. Tente novamente.";
+    const typingEl=document.getElementById("typing");
+    const typingTop=typingEl?typingEl.offsetTop:null;
     typingEl?.remove();
-    historico[modo].push({ role: "assistant", content: reply });
-    exibeMsg("assistant", reply);
-    // Scroll para o início da resposta
-    if (typingTop !== null) {
-      document.getElementById("chat-area").scrollTop = typingTop - 16;
-    }
-  } catch {
+    historico[modo].push({role:"assistant",content:reply});
+    exibeMsg("assistant",reply);
+    if(typingTop!==null) document.getElementById("chat-area").scrollTop=typingTop-16;
+  }catch{
     document.getElementById("typing")?.remove();
-    const err = "Erro de conexão. Tente novamente.";
-    historico[modo].push({ role: "assistant", content: err });
-    exibeMsg("assistant", err);
-  } finally {
-    loading = false;
-    document.getElementById("send-btn").disabled = !document.getElementById("msg-input").value.trim();
+    const err="Erro de conexão. Tente novamente.";
+    historico[modo].push({role:"assistant",content:err});
+    exibeMsg("assistant",err);
+  }finally{
+    loading=false;
+    document.getElementById("send-btn").disabled=!document.getElementById("msg-input").value.trim();
   }
 }
 </script>
