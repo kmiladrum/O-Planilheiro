@@ -624,6 +624,49 @@ function setMode(m) {
   checkBanners();
 }
 
+function extrairPlanilhaJSON(text) {
+  // Tenta varias formas de encontrar o bloco planilha
+  const OPEN = "```planilha";
+  const si = text.indexOf(OPEN);
+  if (si === -1) return null;
+
+  // Pega tudo depois de ```planilha
+  const afterOpen = text.substring(si + OPEN.length);
+
+  // Encontra o fechamento ```
+  const closeIdx = afterOpen.indexOf("```");
+  const raw = closeIdx !== -1 ? afterOpen.substring(0, closeIdx) : afterOpen;
+
+  // Limpa e tenta parsear
+  const jsonStr = raw.trim();
+  const attempts = [
+    jsonStr,
+    jsonStr.replace(/\n/g, " ").replace(/\r/g, ""),
+    jsonStr.replace(/[\u0000-\u001F]/g, " "),
+    jsonStr.replace(/\n/g, "").replace(/\r/g, "").replace(/[\u0000-\u001F]/g, ""),
+  ];
+
+  for (const attempt of attempts) {
+    try {
+      const parsed = JSON.parse(attempt);
+      if (parsed.filename && parsed.sheets) return parsed;
+    } catch(e) { /* tenta o proximo */ }
+  }
+
+  console.error("Nao foi possivel parsear JSON:", jsonStr.substring(0, 200));
+  return null;
+}
+
+function limparBlocoPlanilha(text) {
+  const OPEN = "```planilha";
+  const si = text.indexOf(OPEN);
+  if (si === -1) return text;
+  const afterOpen = text.substring(si + OPEN.length);
+  const closeIdx = afterOpen.indexOf("```");
+  const end = closeIdx !== -1 ? si + OPEN.length + closeIdx + 3 : text.length;
+  return (text.substring(0, si) + text.substring(end)).trim();
+}
+
 function exibeMsg(role, content) {
   const ci = document.getElementById("chat-inner");
   const isUser = role === "user";
@@ -638,47 +681,26 @@ function exibeMsg(role, content) {
   const bubble = document.createElement("div");
   bubble.className = "msg-bubble";
 
-  if (role === "assistant") {
-    // Procura pelo bloco ```planilha
-    const OPEN = "```planilha";
-    const CLOSE = "```";
-    const si = content.indexOf(OPEN);
-    let jsonData = null;
-    let displayContent = content;
-
-    if (si !== -1) {
-      const afterNewline = content.indexOf("\n", si);
-      const jsonStart = afterNewline !== -1 ? afterNewline + 1 : si + OPEN.length;
-      const closeIdx = content.indexOf(CLOSE, jsonStart);
-      if (closeIdx !== -1) {
-        const jsonStr = content.substring(jsonStart, closeIdx).trim();
-        displayContent = (content.substring(0, si) + content.substring(closeIdx + 3)).trim();
-        try {
-          jsonData = JSON.parse(jsonStr);
-        } catch(e) {
-          console.warn("JSON inválido, tentando limpar...", e.message);
-          try {
-            // Remove caracteres de controle e tenta de novo
-            const safe = jsonStr.replace(/[\u0000-\u001F]/g, " ").replace(/\n/g, " ").replace(/\r/g, "");
-            jsonData = JSON.parse(safe);
-          } catch(e2) {
-            console.error("Falha no parse JSON:", jsonStr.substring(0, 300));
-          }
-        }
-      }
-    }
-
+  if (role === "assistant" && content.indexOf("```planilha") !== -1) {
+    const jsonData = extrairPlanilhaJSON(content);
+    const displayContent = limparBlocoPlanilha(content);
     bubble.innerHTML = formatMsg(displayContent);
 
     if (jsonData) {
       const sep = document.createElement("div");
-      sep.style.cssText = "margin-top:14px;padding-top:14px;border-top:1px solid var(--border);";
+      sep.style.cssText = "margin-top:16px;padding-top:14px;border-top:1px solid var(--border);";
       const btn = document.createElement("button");
       btn.className = "btn-download";
       btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar planilha Excel (.xlsx)';
       btn.onclick = () => gerarExcel(jsonData);
       sep.appendChild(btn);
       bubble.appendChild(sep);
+    } else {
+      // JSON nao parseou mas tem o bloco — mostra aviso
+      const warn = document.createElement("div");
+      warn.style.cssText = "margin-top:12px;padding:10px 14px;background:#fef3cd;border:1px solid #fde68a;border-radius:8px;font-size:13px;color:#92400e;";
+      warn.textContent = "⚠️ Houve um problema ao gerar o arquivo. Por favor, peça novamente.";
+      bubble.appendChild(warn);
     }
   } else {
     bubble.innerHTML = formatMsg(content);
