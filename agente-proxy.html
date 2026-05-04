@@ -391,6 +391,7 @@ body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',sans-
 //  CONFIG — edite aqui
 // ════════════════════════════════════════════════════════
 const SENHAS_BASICO = ["BASICO2025","PLAN123","EXCEL001"];
+const _BLK="`".repeat(3);
 const SENHAS_PRO    = ["PRO2025","PLANPRO1","POWERBI01"];
 const LIMITE_BASICO = 50;
 
@@ -552,7 +553,7 @@ function renderOnboardStep(){
   const isLast=_onboardStep===ONBOARD_STEPS.length-1;
   document.getElementById("onboard-next-btn").textContent=isLast?"Começar! 🚀":"Próximo →";
   const dots=document.getElementById("onboard-dots");
-  dots.innerHTML=ONBOARD_STEPS.map((_,i)=>`<div class="onboard-dot${i===_onboardStep?" active":""}"></div>`).join("");
+  dots.innerHTML=ONBOARD_STEPS.map((_,i)=>"<div class=\"onboard-dot"+(i===_onboardStep?" active":"")+"\"></div>").join("");
 }
 function onboardNext(){if(_onboardStep<ONBOARD_STEPS.length-1){_onboardStep++;renderOnboardStep();}else{fecharOnboard();}}
 function fecharOnboard(){document.getElementById("onboard-overlay").style.display="none";localStorage.setItem("pl_onboard_done","1");}
@@ -570,7 +571,7 @@ const TEMPLATES=[
 ];
 function abrirTemplates(){
   const grid=document.getElementById("tpl-grid");
-  grid.innerHTML=TEMPLATES.map((t,i)=>`<div class="tpl-card" onclick="usarTemplate(${i})"><span class="tpl-icon">${t.icon}</span><div class="tpl-name">${t.name}</div><div class="tpl-desc">${t.desc}</div><span class="tpl-badge pro">PRO</span></div>`).join("");
+  grid.innerHTML=TEMPLATES.map((t,i)=>"<div class=\"tpl-card\" onclick=\"usarTemplate("+i+")\"><span class=\"tpl-icon\">"+t.icon+"</span><div class=\"tpl-name\">"+t.name+"</div><div class=\"tpl-desc\">"+t.desc+"</div><span class=\"tpl-badge pro\">PRO</span></div>").join("");
   document.getElementById("tpl-overlay").classList.add("open");
 }
 function fecharTemplates(e){if(!e||e.target===document.getElementById("tpl-overlay"))document.getElementById("tpl-overlay").classList.remove("open");}
@@ -595,7 +596,7 @@ function exibePlanilhaCard(parsedPayload){
   palRow.appendChild(palLabel);
   Object.entries(PALETTES).forEach(([key,pal])=>{
     const btn=document.createElement("button");btn.className="pal-btn"+(key===selectedPalette?" active":"");
-    btn.dataset.pal=key;btn.innerHTML=`<span class="pal-dot" style="background:${pal.dot}"></span>${pal.label}`;
+    btn.dataset.pal=key;btn.innerHTML='<span class="pal-dot" style="background:'+pal.dot+'"></span>'+pal.label;
     btn.onclick=()=>{selectedPalette=key;div.querySelectorAll(".pal-btn").forEach(b=>b.classList.toggle("active",b.dataset.pal===key));};
     palRow.appendChild(btn);
   });
@@ -604,7 +605,7 @@ function exibePlanilhaCard(parsedPayload){
   const cardTop=document.createElement("div");cardTop.className="dl-card-top";
   const sc=parsedPayload.sheets.length;const kc=parsedPayload.dashboard?.kpis?.length||0;
   const ct=parsedPayload.dashboard?.title||parsedPayload.filename||"Planilha";
-  cardTop.innerHTML=`<div class="dl-card-icon">📊</div><div class="dl-card-info"><div class="dl-card-title">${ct}</div><div class="dl-card-sub">${sc} aba(s) · ${kc} KPIs · Dashboard · Fórmulas automáticas · Formatação condicional</div></div>`;
+  cardTop.innerHTML='<div class="dl-card-icon">📊</div><div class="dl-card-info"><div class="dl-card-title">'+ct+'</div><div class="dl-card-sub">'+sc+' aba(s) · '+kc+' KPIs · Dashboard · Fórmulas automáticas · Formatação condicional</div></div>';
   card.appendChild(cardTop);
   const ca=document.createElement("div");ca.className="dl-card-actions";
   const btn=document.createElement("button");btn.className="btn-dl";
@@ -675,16 +676,16 @@ function renderHistBody(){
   if(histTab==="form"){
     const h=getHistorico().filter(it=>!q||it.formula.toLowerCase().includes(q)||((it.desc||"").toLowerCase().includes(q)));
     if(h.length===0){body.innerHTML=`<div class="hist-empty">📭 Nenhuma fórmula salva ainda.<br/>As fórmulas geradas aparecem aqui automaticamente.</div>`;}
-    else{body.innerHTML=h.map((item,i)=>`<div class="hist-item" onclick="usarFormula(${i})"><div class="hist-item-formula">${esc(item.formula)}</div><div class="hist-item-desc">${esc(item.desc||"Fórmula salva")}</div><div class="hist-item-date">${item.date}</div></div>`).join("");}
+    else{body.innerHTML=h.map((item,i)=>"<div class=\"hist-item\" onclick=\"usarFormula("+i+")\"><div class=\"hist-item-formula\">"+esc(item.formula)+"</div><div class=\"hist-item-desc\">"+esc(item.desc||"Fórmula salva")+"</div><div class=\"hist-item-date\">"+item.date+"</div></div>").join("");}
   }else{
     const logs=getPlanilhasLog().filter(l=>!q||l.nome.toLowerCase().includes(q)||l.palette.toLowerCase().includes(q));
     if(logs.length===0){body.innerHTML=`<div class="hist-empty">📊 Nenhuma planilha gerada ainda.<br/>Baixe uma planilha para ver o histórico aqui.</div>`;}
-    else{body.innerHTML=logs.map(l=>`<div class="hist-gen-item"><div class="hist-gen-name">📊 ${esc(l.nome)}</div><div class="hist-gen-meta">Tema: ${l.palette} · ${l.abas} aba(s) · ${l.data} ${l.hora}</div></div>`).join("");}
+    else{body.innerHTML=logs.map(l=>"<div class=\"hist-gen-item\"><div class=\"hist-gen-name\">📊 "+esc(l.nome)+"</div><div class=\"hist-gen-meta\">Tema: "+l.palette+" · "+l.abas+" aba(s) · "+l.data+" "+l.hora+"</div></div>").join("");}
   }
 }
 function usarFormula(i){
   const h=getHistorico();
-  if(h[i]){document.getElementById("msg-input").value=`Explica esta fórmula: ${h[i].formula}`;document.getElementById("send-btn").disabled=false;}
+  if(h[i]){document.getElementById("msg-input").value="Explica esta fórmula: "+h[i].formula;document.getElementById("send-btn").disabled=false;}
   fecharHistorico();
 }
 
@@ -752,13 +753,13 @@ function setMode(m){
 //  PARSER JSON — robusto para qualquer formato do Claude
 // ════════════════════════════════════════════════════════
 function extrairBlocoRaw(text){
-  const TAGS=["```planilha-pro","```json","```planilha","```"];
+  const TAGS=[_BLK+"planilha-pro",_BLK+"json",_BLK+"planilha",_BLK];
   for(const tag of TAGS){
     const si=text.indexOf(tag);if(si===-1)continue;
     const after=text.substring(si+tag.length);
     const firstNL=after.indexOf("\n");
     const content=firstNL!==-1?after.substring(firstNL+1):after;
-    const closeIdx=content.indexOf("```");
+    const closeIdx=content.indexOf(_BLK);
     const raw=closeIdx!==-1?content.substring(0,closeIdx):content;
     if(raw.trim().startsWith("{"))return raw.trim();
   }
@@ -789,11 +790,11 @@ function extrairJSON(text){
   return null;
 }
 function limparBloco(text){
-  const TAGS=["```planilha-pro","```json","```planilha","```"];
+  const TAGS=[_BLK+"planilha-pro",_BLK+"json",_BLK+"planilha",_BLK];
   for(const tag of TAGS){
     const si=text.indexOf(tag);if(si===-1)continue;
     const after=text.substring(si+tag.length);
-    const ci=after.indexOf("```");
+    const ci=after.indexOf(_BLK);
     if(ci!==-1)return(text.substring(0,si)+text.substring(si+tag.length+ci+3)).trim();
   }
   return text;
@@ -904,11 +905,11 @@ async function gerarExcel(payload,palette){
   ];
   let row=5;
   for(const[t,d]of steps){
-    wi.mergeCells(`B${row}:J${row}`);
-    const ct=wi.getCell(`B${row}`);ct.value="  "+t;ct.font=mkFont(p.acc1,11,true);
+    wi.mergeCells("B"+row+":J"+row);
+    const ct=wi.getCell("B"+row);ct.value="  "+t;ct.font=mkFont(p.acc1,11,true);
     ct.fill=fg("EAF7F3");ct.alignment=mkAlign("left");wi.getRow(row).height=24;row++;
-    wi.mergeCells(`B${row}:J${row}`);
-    const cd=wi.getCell(`B${row}`);cd.value=d;cd.font=mkFont("1A1A1A",10);
+    wi.mergeCells("B"+row+":J"+row);
+    const cd=wi.getCell("B"+row);cd.value=d;cd.font=mkFont("1A1A1A",10);
     cd.fill=fg(p.bodyBg);cd.alignment=mkAlign("left","middle",true);wi.getRow(row).height=38;row+=2;
   }
 
@@ -972,23 +973,25 @@ async function gerarExcel(payload,palette){
         const rest = inputCurrencyCols.slice(1).map(c=>colLetter(c+1));
 
         if(hdr.includes("lucro")||hdr.includes("resultado")||hdr.includes("saldo")||hdr.includes("liquido")){
-          formulaPatterns[ci] = (r) => `${first}${r}-${rest.map(c=>c+r).join("-")}`;
+          formulaPatterns[ci] = (r) => first+r+"-"+rest.map(c=>c+r).join("-");
         } else if(hdr.includes("total")||hdr.includes("soma")||hdr.includes("despesa total")){
-          formulaPatterns[ci] = (r) => `SUM(${first}${r}:${colLetter(inputCurrencyCols[inputCurrencyCols.length-1]+1)}${r})`;
+          formulaPatterns[ci] = (r) => "SUM("+first+r+":"+colLetter(inputCurrencyCols[inputCurrencyCols.length-1]+1)+r+")";
         } else if(hdr.includes("margin")||hdr.includes("margem")||hdr.includes("%")||colTypes[ci]==="percent"){
           // Margem = (Receita - Despesa) / Receita  ou  Lucro / Receita
           const lucroCi = formulaColsList.find(c=>(headers[c]||"").toLowerCase().includes("lucro"));
           if(lucroCi!==undefined){
-            formulaPatterns[ci] = (r) => `${colLetter(lucroCi+1)}${r}/${first}${r}`;
+            formulaPatterns[ci] = (r) => colLetter(lucroCi+1)+r+"/"+first+r;
           } else {
-            formulaPatterns[ci] = (r) => `(${first}${r}-${second}${r})/${first}${r}`;
+            formulaPatterns[ci] = (r) => "("+first+r+"-"+second+r+")/"+first+r;
           }
         } else {
-          formulaPatterns[ci] = (r) => `${first}${r}-${rest.map(c=>c+r).join("-")}`;
+          formulaPatterns[ci] = (r) => first+r+"-"+rest.map(c=>c+r).join("-");
         }
       } else if(inputCurrencyCols.length===1){
-        formulaPatterns[ci] = (r) => `${colLetter(inputCurrencyCols[0]+1)}${r}`;
+        formulaPatterns[ci] = (r) => colLetter(inputCurrencyCols[0]+1)+r;
       }
+
+    } // end for formulaColsList
 
     const ws=wb.addWorksheet(wsName);
     ws.views=[{showGridLines:false}];ws.tabColor=hx(p.acc1);
@@ -1027,7 +1030,7 @@ async function gerarExcel(payload,palette){
             c.value={formula:gen(excelRow),result:0};
           }else{
             // último recurso: referencia à célula anterior
-            c.value={formula:`${colLetter(ci)}${excelRow}`,result:0};
+            c.value={formula:colLetter(ci)+excelRow,result:0};
           }
           // Destaque visual: fundo levemente diferente para colunas calculadas
           c.fill=fg(ri%2===0?"D4EDDA":"E8F5EE"); // verde muito suave = calculado
@@ -1062,10 +1065,10 @@ async function gerarExcel(payload,palette){
         if(ci===0){
           c.value="TOTAL";c.alignment=mkAlign("left","middle");
         }else if(typ==="currency"||typ==="number"){
-          c.value={formula:`SUM(${cl}${DATA_START}:${cl}${totalRow-1})`,result:0};
+          c.value={formula:"SUM("+cl+DATA_START+":"+cl+(totalRow-1)+")",result:0};
           c.numFmt=NUM_FMT[typ];
         }else if(typ==="percent"){
-          c.value={formula:`AVERAGE(${cl}${DATA_START}:${cl}${totalRow-1})`,result:0};
+          c.value={formula:"AVERAGE("+cl+DATA_START+":"+cl+(totalRow-1)+")",result:0};
           c.numFmt=NUM_FMT.percent;
         }
         c.font=mkFont(p.hdrFg,10,true);c.fill=fg(p.hdrBg);
@@ -1078,7 +1081,7 @@ async function gerarExcel(payload,palette){
       const typ=colTypes[ci]||"text";
       if(typ==="currency"||typ==="number"){
         const cl=colLetter(ci+1);
-        const range=`${cl}${DATA_START}:${cl}${DATA_START+rows.length-1}`;
+        const range=cl+DATA_START+":"+cl+(DATA_START+rows.length-1);
         ws.addConditionalFormatting({ref:range,rules:[{
           type:"cellIs",operator:"greaterThan",formulae:[0],
           style:{fill:{type:"pattern",pattern:"solid",bgColor:{argb:"FFD4EDDA"}},font:{color:{argb:"FF155724"}}}
@@ -1225,7 +1228,7 @@ function buildPreview(payload){
   if(rows.length>5){
     const tr=document.createElement("tr");
     const td=document.createElement("td");td.colSpan=headers.length;
-    td.textContent=`... mais ${rows.length-5} linhas`;
+    td.textContent="... mais "+(rows.length-5)+" linhas";
     td.style.cssText="text-align:center;color:var(--txt3);font-style:italic;";
     tr.appendChild(td);tbody.appendChild(tr);
   }
@@ -1245,7 +1248,7 @@ function exibeMsg(role,content){
 
   const bubble=document.createElement("div");bubble.className="msg-bubble";
 
-  const hasPro=role==="assistant"&&(content.includes("```planilha-pro")||(content.includes('"sheets"')&&content.includes("```")));
+  const hasPro=role==="assistant"&&(content.indexOf(_BLK+"planilha-pro")!==-1||(content.indexOf('sheets')!==-1&&content.indexOf(_BLK)!==-1));
 
   if(hasPro){
     const parsedPayload=extrairJSON(content);
@@ -1265,7 +1268,7 @@ function exibeMsg(role,content){
     Object.entries(PALETTES).forEach(([key,pal])=>{
       const btn=document.createElement("button");btn.className="pal-btn"+(key===selectedPalette?" active":"");
       btn.dataset.pal=key;
-      btn.innerHTML=`<span class="pal-dot" style="background:${pal.dot}"></span>${pal.label}`;
+      btn.innerHTML='<span class="pal-dot" style="background:'+pal.dot+'"></span>'+pal.label;
       btn.onclick=()=>{selectedPalette=key;document.querySelectorAll(".pal-btn").forEach(b=>b.classList.toggle("active",b.dataset.pal===key));};
       palRow.appendChild(btn);
     });
@@ -1277,12 +1280,12 @@ function exibeMsg(role,content){
     const sheetCount=parsedPayload?parsedPayload.sheets.length:0;
     const kpiCount=parsedPayload?.dashboard?.kpis?.length||0;
     const cardTitle=parsedPayload?.dashboard?.title||parsedPayload?.filename||"Planilha";
-    cardTop.innerHTML=`<div class="dl-card-icon">📊</div><div class="dl-card-info"><div class="dl-card-title">${cardTitle}</div><div class="dl-card-sub">${sheetCount} aba(s) · ${kpiCount} KPIs · Dashboard · Gráfico · Formatação condicional</div></div>`;
+    cardTop.innerHTML='<div class="dl-card-icon">📊</div><div class="dl-card-info"><div class="dl-card-title">'+cardTitle+'</div><div class="dl-card-sub">'+sheetCount+' aba(s) · '+kpiCount+' KPIs · Dashboard · Fórmulas automáticas · Formatação condicional</div></div>';
     card.appendChild(cardTop);
 
     const cardActions=document.createElement("div");cardActions.className="dl-card-actions";
     const btn=document.createElement("button");btn.className="btn-dl";
-    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar Planilha .xlsx`;
+    btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar Planilha .xlsx';
 
     if(parsedPayload){
       btn.onclick=async()=>{
@@ -1295,15 +1298,15 @@ function exibeMsg(role,content){
           salvarPlanilhaLog(cardTitle,selectedPalette,sheetCount);
           showToast("✅ "+cardTitle+".xlsx baixado! ("+count+"/"+LIMITE_PLAN_PRO+" este mês)");
           btn.innerHTML="✅ Download iniciado!";btn.style.background="#27AE60";
-          setTimeout(()=>{btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar novamente`;btn.style.background="";btn.disabled=false;},3000);
+          setTimeout(()=>{btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar novamente';btn.style.background="";btn.disabled=false;},3000);
         }catch(err){
           console.error(err);btn.innerHTML="❌ Erro — tente novamente";btn.style.background="#E84855";btn.disabled=false;
-          setTimeout(()=>{btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar Planilha .xlsx`;btn.style.background="";},3000);
+          setTimeout(()=>{btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar Planilha .xlsx';btn.style.background="";},3000);
         }
       };
     }else{
       btn.textContent="🔄 Gerar novamente";btn.style.background="#F5A623";
-      btn.onclick=()=>enviar("Por favor, gere a planilha novamente com o JSON em uma única linha dentro do bloco ```planilha-pro.");
+      btn.onclick=()=>enviar("Por favor, gere a planilha novamente com o JSON em uma única linha dentro do bloco "+_BLK+"planilha-pro.");
     }
 
     cardActions.appendChild(btn);card.appendChild(cardActions);
@@ -1340,14 +1343,14 @@ function exibeMsg(role,content){
 //  FORMAT MSG — com botão copiar em blocos de código
 // ════════════════════════════════════════════════════════
 function formatMsg(text){
-  return text.split(/(```[\s\S]*?```)/g).map(part=>{
-    if(part.startsWith("```")&&part.endsWith("```")){
+  const _re=new RegExp("("+_BLK+"[\\s\\S]*?"+_BLK+")","g");return text.split(_re).map(part=>{
+    if(part.startsWith(_BLK)&&part.endsWith(_BLK)){
       const code=part.slice(3,-3).replace(/^\w+\n/,"");
       const id="code-"+Math.random().toString(36).slice(2,7);
       // Extrai fórmulas para salvar no histórico
       const lines=code.split("\n").filter(l=>l.trim().startsWith("="));
       lines.forEach(l=>{const f=l.trim();if(f.length>2)saveFormula(f,"Fórmula gerada pelo Planilheiro");});
-      return `<div class="msg-code-wrap"><pre class="msg-code" id="${id}">${esc(code)}</pre><button class="btn-copy" onclick="copiarCodigo('${id}',this)">Copiar</button></div>`;
+      return '<div class="msg-code-wrap"><pre class="msg-code" id="'+id+'">'+ esc(code) +'</pre><button class="btn-copy" onclick="copiarCodigo(\''+ id +'\',this)">Copiar</button></div>';
     }
     return part
       .replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>")
@@ -1397,8 +1400,8 @@ function checkBanners(){
   const r=LIMITE_BASICO-getUsos();
   document.getElementById("banner-warn").style.display=r<=10&&r>0?"block":"none";
   document.getElementById("banner-block").style.display=r<=0?"flex":"none";
-  if(r<=10&&r>0)document.getElementById("banner-warn").textContent=`⚠️ Você tem apenas ${r} perguntas restantes hoje.`;
-  document.getElementById("brand-plan-text").textContent=`Plano Básico · ${Math.max(0,r)} restantes`;
+  if(r<=10&&r>0)document.getElementById("banner-warn").textContent="⚠️ Você tem apenas "+r+" perguntas restantes hoje.";
+  document.getElementById("brand-plan-text").textContent="Plano Básico · "+Math.max(0,r)+" restantes";
 }
 
 // ════════════════════════════════════════════════════════
@@ -1428,7 +1431,7 @@ async function enviar(txt){
 
   const ci=document.getElementById("chat-inner");
   const typDiv=document.createElement("div");typDiv.className="msg";typDiv.id="typing";
-  typDiv.innerHTML=`<div class="msg-avatar">📊</div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  typDiv.innerHTML='<div class="msg-avatar">📊</div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
   ci.appendChild(typDiv);
   document.getElementById("chat-area").scrollTop=999999;
 
